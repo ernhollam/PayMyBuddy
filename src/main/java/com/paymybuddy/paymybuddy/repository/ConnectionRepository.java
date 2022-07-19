@@ -4,9 +4,9 @@ import com.paymybuddy.paymybuddy.model.Connection;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public interface ConnectionRepository extends CrudRepository<Connection, Integer> {
-	Set<Connection> findByInitializerIdOrReceiverId(Long initializerId, Long receiverId);
+	List<Connection> findByInitializerIdOrReceiverId(Integer initializerId, Integer receiverId);
 }

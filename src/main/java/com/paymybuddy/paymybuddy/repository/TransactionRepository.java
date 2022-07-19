@@ -4,9 +4,9 @@ import com.paymybuddy.paymybuddy.model.Transaction;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public interface TransactionRepository extends CrudRepository<Transaction, Integer> {
-	Set<Transaction> findByIssuerIdOrPayeeId(Long issuerId, Long payeeId);
+	List<Transaction> findByIssuerIdOrPayeeId(Long issuerId, Long payeeId);
 }
