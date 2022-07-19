@@ -64,9 +64,9 @@ class DBConnectionServiceTest {
 				new ArrayList<>());
 
 		User receiver = new User(3,
-				"abc@email.com",
-				"111444555",
-				"Victor",
+				"gh@email.com",
+				"222444555",
+				"Gavroche",
 				"Hugo",
 				new BigDecimal("-140.19"),
 				new ArrayList<>(),

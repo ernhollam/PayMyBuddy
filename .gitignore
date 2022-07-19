@@ -34,3 +34,4 @@ build/
 
 #externalize configuration
 /src/main/resources/config/application.properties
+/src/test/resources/application.properties
