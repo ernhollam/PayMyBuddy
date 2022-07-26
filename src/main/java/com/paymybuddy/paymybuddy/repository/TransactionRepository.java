@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends CrudRepository<Transaction, Integer> {
 	List<Transaction> findByIssuerOrPayee(User issuer, User payee);
-
-	@Transactional
-	void deleteByIssuerOrPayee(User issuer, User payee);
+	List<Transaction> findByIssuer(User issuer);
+	List<Transaction> findByPayee(User payee);
 }
