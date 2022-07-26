@@ -1,7 +1,9 @@
 package com.paymybuddy.paymybuddy.service;
 
+import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class DBUserService implements UserService {
 
 	/**
@@ -37,14 +40,23 @@ public class DBUserService implements UserService {
 	 * @return User with id.
 	 */
 	@Override public User createUser(User user) {
-		String encryptedPassword = passwordEncoder.encode(user.getPassword());
-		user.setPassword(encryptedPassword);
-		user.setBalance(BigDecimal.ZERO);
-		return userRepository.save(user);
+		// Detect if email is already used
+		Optional<User> existingUserWithEmail = userRepository.findByEmail(user.getEmail());
+		if (existingUserWithEmail.isPresent()) {
+			String errorMessage = "Email " + user.getEmail() + " is already used." +
+					"Please sign in with another email.";
+			log.error(errorMessage);
+			throw new EmailAlreadyUsedException(errorMessage);
+		} else {
+			String encryptedPassword = passwordEncoder.encode(user.getPassword());
+			user.setPassword(encryptedPassword);
+			user.setBalance(BigDecimal.ZERO);
+			return userRepository.save(user);
+		}
 	}
 
 	/**
-	 * List all users in database.
+	 * Lists all users in database.
 	 *
 	 * @return a set of users.
 	 */

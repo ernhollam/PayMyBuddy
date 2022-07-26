@@ -18,7 +18,7 @@ public interface UserService {
 	User createUser(User user);
 
 	/**
-	 * List all users in database.
+	 * Lists all users in database.
 	 * @return a set of users.
 	 */
 	Iterable<User> getUsers();
