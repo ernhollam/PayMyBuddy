@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class DBConnectionServiceTest {
+class ConnectionServiceTest {
 	// configure LocalDateTime.now() to 18th July 2022, 10:00:00
 	public final static LocalDateTime LOCAL_DATE_NOW = LocalDateTime.of(2022, 7, 18, 10, 0, 0);
 
@@ -30,7 +30,7 @@ class DBConnectionServiceTest {
 	 * Class under test.
 	 */
 	@Autowired
-	DBConnectionService connectionService;
+	ConnectionService connectionService;
 
 	@MockBean
 	Clock clock;

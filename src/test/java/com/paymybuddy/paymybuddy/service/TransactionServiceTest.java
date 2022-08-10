@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DBTransactionServiceTest {
+class TransactionServiceTest {
 
 	// TODO check de la somme négative
 	// TODO check de la somme égale à 0

@@ -12,7 +12,7 @@ class DBUserServiceTest {
 	 * Class under test.
 	 */
 	@Autowired
-	DBUserService userService;
+	UserService userService;
 
 	@MockBean UserRepository userRepository;
 	@MockBean PasswordEncoder passwordEncoder;
