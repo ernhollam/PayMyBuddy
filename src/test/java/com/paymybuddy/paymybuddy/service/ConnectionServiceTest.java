@@ -3,6 +3,7 @@ package com.paymybuddy.paymybuddy.service;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
+import com.paymybuddy.paymybuddy.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,9 @@ class ConnectionServiceTest {
 
     @MockBean
     ConnectionRepository connectionRepository;
+
+    @MockBean
+    UserRepository userRepository;
 
     @BeforeEach
     public void init() {

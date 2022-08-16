@@ -3,6 +3,7 @@ package com.paymybuddy.paymybuddy.repository;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ class ConnectionRepositoryIT {
     }
 
     @Test
+    @DisplayName("Saving a new connection should add an ID")
     void createConnection_savesNewConnection() {
         Connection savedConnection = connectionRepository.save(connection);
         assertThat(savedConnection.getId()).isNotNull();
@@ -69,6 +71,7 @@ class ConnectionRepositoryIT {
 
 
     @Test
+    @DisplayName("findByInitializerOrReceiver should return a connection when connection exists")
     public void findByInitializerOrReceiver_shouldReturn_aConnection() {
         //GIVEN an existing connection
         Connection connectionToFind = connectionRepository.save(connection);
@@ -79,6 +82,7 @@ class ConnectionRepositoryIT {
     }
 
     @Test
+    @DisplayName("deleteByInitializer should delete connection when it exists")
     void deleteByInitializer_shouldDeleteConnection() {
         //GIVEN an existing connection
         Connection connectionToDelete = connectionRepository.save(connection);
@@ -90,6 +94,7 @@ class ConnectionRepositoryIT {
     }
 
     @Test
+    @DisplayName("deleteByReceiver should delete a connection")
     void deleteByReceiver_shouldDeleteConnection() {
         //GIVEN an existing connection
         Connection connectionToDelete = connectionRepository.save(connection);

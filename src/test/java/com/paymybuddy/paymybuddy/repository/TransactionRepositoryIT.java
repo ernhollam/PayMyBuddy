@@ -3,6 +3,7 @@ package com.paymybuddy.paymybuddy.repository;
 import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.model.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,7 @@ class TransactionRepositoryIT {
     }
 
     @Test
+    @DisplayName("Saving a new transaction should add an ID")
     void createTransaction_savesNewTransaction() {
         Transaction savedTransaction = transactionRepository.save(transaction);
         assertThat(savedTransaction.getId()).isNotNull();
@@ -71,6 +73,7 @@ class TransactionRepositoryIT {
 
 
     @Test
+    @DisplayName("findByIssuerOrPayee should return a transaction when transaction exists")
     public void findByIssuerOrPayee_shouldReturn_aTransaction() {
         //GIVEN an existing transaction
         Transaction transactionToFind = transactionRepository.save(transaction);
@@ -81,6 +84,7 @@ class TransactionRepositoryIT {
     }
 
     @Test
+    @DisplayName("findByIssuer should return a transaction when transaction exists")
     void findByIssuer_shouldReturn_aTransaction() {
         //GIVEN an existing transaction
         Transaction transactionToFind = transactionRepository.save(transaction);
@@ -91,6 +95,7 @@ class TransactionRepositoryIT {
     }
 
     @Test
+    @DisplayName("findByPayee should return a transaction when transaction exists")
     void findByPayee_shouldReturn_aTransaction() {
         //GIVEN an existing transaction
         Transaction transactionToFind = transactionRepository.save(transaction);
@@ -101,7 +106,8 @@ class TransactionRepositoryIT {
     }
 
     @Test
-    void deleteTransaction_shouldDeleteTransaction() {
+    @DisplayName("deleteById should delete a transaction by ID")
+    void deleteById_shouldDeleteTransaction() {
         //GIVEN an existing transaction
         Transaction transactionToDelete = transactionRepository.save(transaction);
         assertTrue(transactionRepository.existsById(transactionToDelete.getId()));

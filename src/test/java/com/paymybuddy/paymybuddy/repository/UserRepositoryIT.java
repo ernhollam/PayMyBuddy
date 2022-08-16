@@ -2,6 +2,7 @@ package com.paymybuddy.paymybuddy.repository;
 
 import com.paymybuddy.paymybuddy.model.User;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +32,16 @@ class UserRepositoryIT {
     }
 
     @Test
+    @DisplayName("Saving a new user should add an ID to User object")
     void createUser_savesNewUser() {
         User savedUser = userRepository.save(user);
-
         assertThat(savedUser.getId()).isNotNull();
     }
 
 
     @Test
+
+    @DisplayName("findByID should return a user when the user exists")
     public void findById_shouldReturn_aUser() {
         //GIVEN an existing user
         User userToFind = userRepository.save(user);
@@ -49,6 +52,7 @@ class UserRepositoryIT {
     }
 
     @Test
+    @DisplayName("findByEmail should return a user when the user exists")
     void findByEmail_shouldReturn_aUser() {
         //GIVEN an existing user
         User userToFind = userRepository.save(user);
@@ -59,6 +63,7 @@ class UserRepositoryIT {
     }
 
     @Test
+    @DisplayName("findByFirstNameAndLastName should return a user when the user exists")
     void findByFirstNameAndLastName_shouldReturn_aUser() {
         //GIVEN an existing user
         User userToFind = userRepository.save(user);
@@ -70,6 +75,7 @@ class UserRepositoryIT {
     }
 
     @Test
+    @DisplayName("deleteById should delete a user")
     void deleteUser_shouldDeleteUser() {
         //GIVEN an existing user
         User userToDelete = userRepository.save(user);

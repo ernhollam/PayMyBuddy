@@ -50,8 +50,7 @@ public class UserService {
             log.error(errorMessage);
             throw new EmailAlreadyUsedException(errorMessage);
         } else {
-            String encryptedPassword = passwordEncoder.encode(user.getPassword());
-            user.setPassword(encryptedPassword);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setBalance(BigDecimal.ZERO);
             return userRepository.save(user);
         }
