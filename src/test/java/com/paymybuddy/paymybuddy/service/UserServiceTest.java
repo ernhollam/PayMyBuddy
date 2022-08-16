@@ -1,13 +1,16 @@
 package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.repository.UserRepository;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest
-class DBUserServiceTest {
+@ExtendWith(SpringExtension.class)
+@Import(UserService.class)
+class UserServiceTest {
 	/**
 	 * Class under test.
 	 */
