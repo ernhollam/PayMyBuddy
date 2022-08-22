@@ -46,7 +46,7 @@ class ConnectionServiceTest {
     UserRepository userRepository;
 
     @BeforeEach
-    public void init() {
+    public void initClock() {
         // Configure a fixed clock to have fixed LocalDate.now()
         Clock fixedClock = Clock.fixed(LOCAL_DATE_NOW.atZone(ZoneId.systemDefault()).toInstant(),
                                        ZoneId.systemDefault());

@@ -45,17 +45,17 @@ public class TransactionService {
         }
         // Calculate fee and total amount
         double fee = amount * Fee.TRANSACTION_FEE;
-        BigDecimal totalAmount = new BigDecimal(Double.toString(amount + fee)).setScale(Fee.SCALE,
-                                                                                        RoundingMode.HALF_UP);
+        BigDecimal amountWithFee = new BigDecimal(Double.toString(amount + fee)).setScale(Fee.SCALE,
+                                                                                          RoundingMode.HALF_UP);
         // Check that issuer has enough money for this transaction
-        if (issuer.getBalance().compareTo(totalAmount) < 0) {
+        if (issuer.getBalance().compareTo(amountWithFee) < 0) {
             String errorMessage = "Issuer has insufficient balance to make this transfer.";
             log.error(errorMessage);
             throw new InsufficientBalanceException(errorMessage);
         }
         if (connectionService.getUserConnections(issuer).contains(payee)) {
             // Withdraw amount with applied fee from issuer's balance
-            issuer.setBalance(issuer.getBalance().subtract(totalAmount));
+            issuer.setBalance(issuer.getBalance().subtract(amountWithFee));
             // Credit payee
             BigDecimal transactionAmount = new BigDecimal(Double.toString(amount))
                     .setScale(Fee.SCALE, RoundingMode.HALF_UP);
@@ -69,8 +69,9 @@ public class TransactionService {
             transaction.setDate(LocalDateTime.now(clock));
             transaction.setDescription(description);
 
-            //TODO ajouter la transaction à la liste des transactions initiées pour l'émetteur
-            // TODO ajouter la transaction à la liste des transactions reçues pour le bénéficiaire
+            issuer.getInitiatedTransactions().add(transaction);
+            payee.getReceivedTransactions().add(transaction);
+
             return transactionRepository.save(transaction);
         } else {
             String errorMessage = "The payee is not a buddy from issuer.";
