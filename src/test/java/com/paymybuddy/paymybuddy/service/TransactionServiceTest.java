@@ -54,7 +54,7 @@ class TransactionServiceTest {
     private double amount;
 
     @BeforeAll
-    void setUp() {
+    void initUsers() {
         issuer = new User();
         issuer.setFirstName("Chandler");
         issuer.setLastName("Bing");

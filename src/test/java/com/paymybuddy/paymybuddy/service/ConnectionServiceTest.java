@@ -1,12 +1,11 @@
 package com.paymybuddy.paymybuddy.service;
 
+import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,13 +18,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @Import(ConnectionService.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ConnectionServiceTest {
     // configure LocalDateTime.now() to 18th July 2022, 10:00:00
     public final static LocalDateTime LOCAL_DATE_NOW = LocalDateTime.of(2022, 7, 18, 10, 0, 0);
@@ -45,6 +47,24 @@ class ConnectionServiceTest {
     @MockBean
     UserRepository userRepository;
 
+    private User initializer;
+    private User receiver;
+
+    @BeforeAll
+    public void initUsers() {
+        initializer = new User();
+        initializer.setFirstName("Chandler");
+        initializer.setLastName("Bing");
+        initializer.setPassword("CouldIBeAnyMoreBored");
+        initializer.setEmail("bingchandler@friends.com");
+
+        receiver = new User();
+        receiver.setFirstName("Joey");
+        receiver.setLastName("Tribbiani");
+        receiver.setPassword("HowUDoin");
+        receiver.setEmail("tribbianijoey@friends.com");
+    }
+
     @BeforeEach
     public void initClock() {
         // Configure a fixed clock to have fixed LocalDate.now()
@@ -58,34 +78,12 @@ class ConnectionServiceTest {
     @DisplayName("getUserConnections should return a list of two connections")
     void getUserConnections() {
         // Given three users
-        User testUser = new User(1,
-                                 "dummy@mail.com",
-                                 "ABCDEF123",
-                                 "Jean",
-                                 "Valjean",
+        User testUser = new User(3,
+                                 "rossgeller@friends.com",
+                                 "wewereonabreak",
+                                 "Ross",
+                                 "Geller",
                                  new BigDecimal("215.64"),
-                                 new ArrayList<>(),
-                                 new ArrayList<>(),
-                                 new ArrayList<>(),
-                                 new ArrayList<>());
-
-        User initializer = new User(2,
-                                    "abc@email.com",
-                                    "111444555",
-                                    "Victor",
-                                    "Hugo",
-                                    new BigDecimal("32.19"),
-                                    new ArrayList<>(),
-                                    new ArrayList<>(),
-                                    new ArrayList<>(),
-                                    new ArrayList<>());
-
-        User receiver = new User(3,
-                                 "gh@email.com",
-                                 "222444555",
-                                 "Gavroche",
-                                 "Hugo",
-                                 new BigDecimal("-140.19"),
                                  new ArrayList<>(),
                                  new ArrayList<>(),
                                  new ArrayList<>(),
@@ -103,5 +101,58 @@ class ConnectionServiceTest {
         assertThat(userConnections.contains(receiver)).isTrue();
         assertThat(userConnections.contains(initializer)).isTrue();
     }
+    @Test
+    @DisplayName("Adding a connection should connect initializer and receiver")
+    void addConnection_shouldConnect_initializerAndReceiver() {
+        String email = "tribbianijoey@friends.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(receiver));
+
+        connectionService.addConnection(initializer, email);
+
+        // Assert both initializer and receiver have a connection in which they appear as such
+        assertThat(initializer.getInitializedConnections()
+                              .stream()
+                              .filter(connection -> connection.getInitializer().equals(initializer)
+                                                    && connection.getReceiver().equals(receiver))).isNotNull();
+        assertThat(receiver.getReceivedConnections()
+                              .stream()
+                              .filter(connection -> connection.getInitializer().equals(initializer)
+                                                    && connection.getReceiver().equals(receiver))).isNotNull();
+    }
+    @Test
+    @DisplayName("Adding a connection should add a connection to initializer's list of initiated connections")
+    void addConnection_shouldAdd_connectionToInitializedConnections() {
+        String email = "tribbianijoey@friends.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(receiver));
+
+        int initiatedConnectionsSizeBefore = initializer.getInitializedConnections().size();
+
+        connectionService.addConnection(initializer, email);
+
+        assertThat(initializer.getInitializedConnections().size()).isEqualTo(initiatedConnectionsSizeBefore + 1);
+    }
+
+    @Test
+    @DisplayName("Adding a connection should add a connection to receiver's list of received connections")
+    void addConnection_shouldAdd_connectionToReceivedConnections() {
+        String email = "tribbianijoey@friends.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(receiver));
+
+        int receivedConnectionsSizeBefore = receiver.getReceivedConnections().size();
+
+        connectionService.addConnection(initializer, email);
+
+        assertThat(receiver.getReceivedConnections().size()).isEqualTo(receivedConnectionsSizeBefore + 1);
+    }
+
+    @Test
+    @DisplayName("Adding a connection with non-existent user should throw an exception")
+    void addConnection_shouldThrow_exception() {
+        String email = "tribbianijoey@friends.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        assertThrows(BuddyNotFoundException.class, () -> connectionService.addConnection(initializer, email));
+    }
+
 
 }

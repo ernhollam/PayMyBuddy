@@ -101,20 +101,5 @@ public class TransactionService {
         return transactionRepository.findById(id);
     }
 
-    /**
-     * Gets transactions issued by user.
-     */
-
-    public List<Transaction> getInitiatedTransactions(User user) {
-        return transactionRepository.findByIssuer(user);
-    }
-
-    /**
-     * Gets transactions received by user.
-     */
-
-    public List<Transaction> getReceivedTransactions(User user) {
-        return transactionRepository.findByPayee(user);
-    }
 }
 
