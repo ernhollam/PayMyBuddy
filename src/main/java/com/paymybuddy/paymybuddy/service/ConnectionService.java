@@ -1,5 +1,6 @@
 package com.paymybuddy.paymybuddy.service;
 
+import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
@@ -57,17 +58,24 @@ public class ConnectionService {
 			log.error(errorMessage);
 			throw new BuddyNotFoundException(errorMessage);
 		} else {
-			// Create connection with both users
 			User receiver = optionalReceiver.get();
-			Connection connection = new Connection();
-			connection.setInitializer(initializer);
-			connection.setReceiver(receiver);
-			connection.setStartingDate(LocalDateTime.now(clock));
-			// Add connection to initializer's initiatedConnections
-			initializer.getInitializedConnections().add(connection);
-			// Add connection to receiver's receivedConnections
-			receiver.getReceivedConnections().add(connection);
-			return saveConnection(connection);
+			if (getUserConnections(initializer).contains(receiver)) {
+				String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
+									  "of yours!.";
+				log.error(errorMessage);
+				throw new AlreadyABuddyException(errorMessage);
+			} else {
+				// Create connection with both users
+				Connection connection = new Connection();
+				connection.setInitializer(initializer);
+				connection.setReceiver(receiver);
+				connection.setStartingDate(LocalDateTime.now(clock));
+				// Add connection to initializer's initiatedConnections
+				initializer.getInitializedConnections().add(connection);
+				// Add connection to receiver's receivedConnections
+				receiver.getReceivedConnections().add(connection);
+				return saveConnection(connection);
+			}
 		}
 
 	}

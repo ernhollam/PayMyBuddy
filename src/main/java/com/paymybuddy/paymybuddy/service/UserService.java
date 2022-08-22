@@ -1,14 +1,16 @@
 package com.paymybuddy.paymybuddy.service;
 
+import com.paymybuddy.paymybuddy.constants.Fee;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 @Service
@@ -25,12 +27,12 @@ public class UserService {
      * Password encoder.
      */
     @Autowired
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
+                       BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     /**
@@ -50,8 +52,8 @@ public class UserService {
             log.error(errorMessage);
             throw new EmailAlreadyUsedException(errorMessage);
         } else {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setBalance(BigDecimal.ZERO);
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user.setBalance(new BigDecimal("0.00"));
             return userRepository.save(user);
         }
     }
@@ -125,4 +127,23 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    /**
+     * Deposits money to buddy account.
+     */
+    public void deposit(User user, String amount) {
+        // if amount is still not valid after interface's validator, remove any negative signs
+        amount = amount.replace("-", "");
+
+        user.setBalance(user.getBalance().add(new BigDecimal(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP)));
+    }
+
+    /**
+     * Withdraws money to user's bank account.
+     */
+    public void withdraw(User user, String amount) {
+        // if amount is still not valid after interface's validator, remove any negative signs
+        amount = amount.replace("-", "");
+
+        user.setBalance(user.getBalance().subtract(new BigDecimal(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP)));
+    }
 }

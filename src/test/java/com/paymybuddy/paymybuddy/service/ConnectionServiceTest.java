@@ -1,5 +1,6 @@
 package com.paymybuddy.paymybuddy.service;
 
+import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
@@ -53,12 +54,14 @@ class ConnectionServiceTest {
     @BeforeAll
     public void initUsers() {
         initializer = new User();
+        initializer.setId(1);
         initializer.setFirstName("Chandler");
         initializer.setLastName("Bing");
         initializer.setPassword("CouldIBeAnyMoreBored");
         initializer.setEmail("bingchandler@friends.com");
 
         receiver = new User();
+        receiver.setId(2);
         receiver.setFirstName("Joey");
         receiver.setLastName("Tribbiani");
         receiver.setPassword("HowUDoin");
@@ -154,5 +157,17 @@ class ConnectionServiceTest {
         assertThrows(BuddyNotFoundException.class, () -> connectionService.addConnection(initializer, email));
     }
 
+    @Test
+    @DisplayName("Adding a connection who is already a buddy should throw an exception")
+    void addConnection_withConflict_shouldThrow_exception() {
+        String email = "tribbianijoey@friends.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(receiver));
+        Connection existingConnection = new Connection(null, initializer, receiver, LocalDateTime.now(clock));
+        when(connectionRepository
+                     .findByInitializerOrReceiver(any(User.class), any(User.class)))
+                .thenReturn(List.of(existingConnection));
+
+        assertThrows(AlreadyABuddyException.class, () -> connectionService.addConnection(initializer, email));
+    }
 
 }
