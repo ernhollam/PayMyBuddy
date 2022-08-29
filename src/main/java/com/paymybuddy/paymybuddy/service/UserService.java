@@ -1,5 +1,6 @@
 package com.paymybuddy.paymybuddy.service;
 
+import com.paymybuddy.paymybuddy.constants.EmailValidator;
 import com.paymybuddy.paymybuddy.constants.Fee;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
@@ -14,6 +15,7 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -47,19 +49,27 @@ public class UserService {
      */
     @Transactional
     public User createUser(User user) {
-        // Detect if email is already used
-        Optional<User> existingUserWithEmail = userRepository.findByEmail(user.getEmail());
-        if (existingUserWithEmail.isPresent()) {
-            String errorMessage = "Email " + user.getEmail() + " is already used." +
-                                  "Please sign in with another email.";
-            log.error(errorMessage);
-            throw new EmailAlreadyUsedException(errorMessage);
+        if (isInvalidEmail(user.getEmail())) {
+            String invalidEmailMessage = "The email provided is invalid.";
+            log.error(invalidEmailMessage);
+            throw new IllegalArgumentException(invalidEmailMessage);
         } else {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            user.setBalance(new BigDecimal("0.00"));
-            return userRepository.save(user);
+            // Detect if email is already used
+            Optional<User> existingUserWithEmail = userRepository.findByEmail(user.getEmail());
+            if (existingUserWithEmail.isPresent()) {
+                String errorMessage = "Email " + user.getEmail() + " is already used." +
+                                      "Please sign in with another email.";
+                log.error(errorMessage);
+                throw new EmailAlreadyUsedException(errorMessage);
+            } else {
+                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+                user.setBalance(new BigDecimal("0.00"));
+                return userRepository.save(user);
+            }
         }
     }
+
+
 
     /**
      * Lists all users in database.
@@ -117,13 +127,19 @@ public class UserService {
      * @return Updated user.
      */
     public User updateUser(User user) {
-        Optional<User> userToUpdate = userRepository.findByEmail(user.getEmail());
-        if (userToUpdate.isEmpty()) {
-            String errorMessage = "The user you are trying to update does not exist.";
-            log.error(errorMessage);
-            throw new BuddyNotFoundException(errorMessage);
+        if (isInvalidEmail(user.getEmail())) {
+            String invalidEmailMessage = "The email provided is invalid.";
+            log.error(invalidEmailMessage);
+            throw new IllegalArgumentException(invalidEmailMessage);
         } else {
-            return userRepository.save(user);
+            Optional<User> userToUpdate = userRepository.findByEmail(user.getEmail());
+            if (userToUpdate.isEmpty()) {
+                String errorMessage = "The user you are trying to update does not exist.";
+                log.error(errorMessage);
+                throw new BuddyNotFoundException(errorMessage);
+            } else {
+                return userRepository.save(user);
+            }
         }
     }
 
@@ -138,6 +154,16 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    /**
+     * Email validator.
+     * @param emailAddress email address to validate
+     * @return true if valid, false otherwise.
+     */
+    public static boolean isInvalidEmail(String emailAddress) {
+        return !Pattern.compile(EmailValidator.REGEX_PATTERN)
+                       .matcher(emailAddress)
+                       .matches();
+    }
     /**
      * Deposits money to buddy account.
      */

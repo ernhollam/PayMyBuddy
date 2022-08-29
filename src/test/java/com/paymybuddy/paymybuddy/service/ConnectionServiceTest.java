@@ -105,6 +105,14 @@ class ConnectionServiceTest {
         assertThat(userConnections.contains(initializer)).isTrue();
     }
     @Test
+    @DisplayName("Adding user with invalid email should throw exception")
+    public void updateUser_usingValidEmail_shouldThrow_exception() {
+        String email = "username@domain";
+
+        assertThrows(IllegalArgumentException.class, () -> connectionService.addConnection(initializer, email));
+    }
+
+    @Test
     @DisplayName("Adding a connection should connect initializer and receiver")
     void addConnection_shouldConnect_initializerAndReceiver() {
         String email = "tribbianijoey@friends.com";
