@@ -52,30 +52,36 @@ public class ConnectionService {
 
 	@Transactional
 	public Connection addConnection(User initializer, String email) {
-		Optional<User> optionalReceiver = userRepository.findByEmail(email);
-		if (optionalReceiver.isEmpty()) {
-			// Check if a user with specified email exists
-			String errorMessage = "Email " + email + " does not match any buddy.";
-			log.error(errorMessage);
-			throw new BuddyNotFoundException(errorMessage);
+		if (UserService.isInvalidEmail(email)) {
+			String invalidEmailMessage = "The email provided is invalid.";
+			log.error(invalidEmailMessage);
+			throw new IllegalArgumentException(invalidEmailMessage);
 		} else {
-			User receiver = optionalReceiver.get();
-			if (getUserConnections(initializer).contains(receiver)) {
-				String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
-									  "of yours!.";
+			Optional<User> optionalReceiver = userRepository.findByEmail(email);
+			if (optionalReceiver.isEmpty()) {
+				// Check if a user with specified email exists
+				String errorMessage = "Email " + email + " does not match any buddy.";
 				log.error(errorMessage);
-				throw new AlreadyABuddyException(errorMessage);
+				throw new BuddyNotFoundException(errorMessage);
 			} else {
-				// Create connection with both users
-				Connection connection = new Connection();
-				connection.setInitializer(initializer);
-				connection.setReceiver(receiver);
-				connection.setStartingDate(LocalDateTime.now(clock));
-				// Add connection to initializer's initiatedConnections
-				initializer.getInitializedConnections().add(connection);
-				// Add connection to receiver's receivedConnections
-				receiver.getReceivedConnections().add(connection);
-				return saveConnection(connection);
+				User receiver = optionalReceiver.get();
+				if (getUserConnections(initializer).contains(receiver)) {
+					String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
+										  "of yours!.";
+					log.error(errorMessage);
+					throw new AlreadyABuddyException(errorMessage);
+				} else {
+					// Create connection with both users
+					Connection connection = new Connection();
+					connection.setInitializer(initializer);
+					connection.setReceiver(receiver);
+					connection.setStartingDate(LocalDateTime.now(clock));
+					// Add connection to initializer's initiatedConnections
+					initializer.getInitializedConnections().add(connection);
+					// Add connection to receiver's receivedConnections
+					receiver.getReceivedConnections().add(connection);
+					return saveConnection(connection);
+				}
 			}
 		}
 

@@ -16,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -53,6 +52,33 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Saving user with valid email should create new user")
+    public void createUser_usingValidEmail_shouldCreate_newUser() {
+        String emailAddress = "username@domain.com";
+        testUser.setEmail(emailAddress);
+        doReturn(Optional.empty())
+                .when(userRepository).findByEmail(emailAddress);
+        when(passwordEncoder.encode(any(String.class)))
+                .thenReturn("ABCDEF123");
+        doReturn(testUser)
+                .when(userRepository).save(any(User.class));
+
+        userService.createUser(testUser);
+
+        verify(userRepository, times(1)).save(testUser);
+        assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("0.00"));
+    }
+
+    @Test
+    @DisplayName("Saving user with invalid email should throw exception")
+    public void createUser_usingValidEmail_shouldThrow_exception() {
+        String emailAddress = "username@domain";
+        testUser.setEmail(emailAddress);
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(testUser));
+    }
+
+    @Test
     @DisplayName("Saving a user with unique email should create new user")
     void createUser_shouldCreate_newUser() {
         // GIVEN a new user with unique email
@@ -65,12 +91,41 @@ class UserServiceTest {
         // WHEN
         userService.createUser(testUser);
         // THEN
-        // TODO confirmer lors de la session
+        // TODO confirmer lors de la session : pourquoi id = null lors des tests in-memory ?
         // asserting that created user is not null does not work, thus we check if the balance was actually set to
         // 0.00 during user creation
         verify(userRepository, times(1)).save(testUser);
         assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("0.00"));
         assertThat(testUser).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Updating user with valid email should update user")
+    public void updateUser_usingValidEmail_shouldUpdate_user() {
+        String emailAddress = "username@domain.com";
+        testUser.setEmail(emailAddress);
+        testUser.setBalance(new BigDecimal("3000.00"));
+        doReturn(Optional.of(testUser))
+                .when(userRepository).findByEmail(emailAddress);
+        when(passwordEncoder.encode(any(String.class)))
+                .thenReturn("ABCDEF123");
+        doReturn(testUser)
+                .when(userRepository).save(any(User.class));
+
+        userService.updateUser(testUser);
+
+        verify(userRepository, times(1)).save(testUser);
+        assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("3000.00"));
+        assertTrue(testUser.getEmail().equalsIgnoreCase(emailAddress));
+    }
+
+    @Test
+    @DisplayName("Updating user with invalid email should throw exception")
+    public void updateUser_usingValidEmail_shouldThrow_exception() {
+        String emailAddress = "username@domain";
+        testUser.setEmail(emailAddress);
+
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(testUser));
     }
 
     @Test
