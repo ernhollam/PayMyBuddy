@@ -50,6 +50,7 @@ public class ConnectionService {
 		return connections;
 	}
 
+	@Transactional
 	public Connection addConnection(User initializer, String email) {
 		Optional<User> optionalReceiver = userRepository.findByEmail(email);
 		if (optionalReceiver.isEmpty()) {

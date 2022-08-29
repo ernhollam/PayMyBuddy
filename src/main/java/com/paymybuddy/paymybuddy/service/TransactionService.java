@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Clock;
@@ -31,7 +32,7 @@ public class TransactionService {
     /**
      * Saves a new transaction.
      */
-
+    @Transactional
     public Transaction createTransaction(User issuer, User payee, String description, double amount) {
         // Check that amount is not negative nor 0
         if (amount < 0) {

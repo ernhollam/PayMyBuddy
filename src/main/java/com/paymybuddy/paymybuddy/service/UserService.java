@@ -1,6 +1,7 @@
 package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.constants.Fee;
+import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
@@ -43,6 +45,7 @@ public class UserService {
      *
      * @return User with id.
      */
+    @Transactional
     public User createUser(User user) {
         // Detect if email is already used
         Optional<User> existingUserWithEmail = userRepository.findByEmail(user.getEmail());
@@ -114,7 +117,14 @@ public class UserService {
      * @return Updated user.
      */
     public User updateUser(User user) {
-        return userRepository.save(user);
+        Optional<User> userToUpdate = userRepository.findByEmail(user.getEmail());
+        if (userToUpdate.isEmpty()) {
+            String errorMessage = "The user you are trying to update does not exist.";
+            log.error(errorMessage);
+            throw new BuddyNotFoundException(errorMessage);
+        } else {
+            return userRepository.save(user);
+        }
     }
 
     /**
@@ -123,6 +133,7 @@ public class UserService {
      * @param user
      *         User to delete.
      */
+    @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);
     }
