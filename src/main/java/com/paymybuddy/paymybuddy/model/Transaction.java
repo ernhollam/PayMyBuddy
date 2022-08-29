@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.mapping.ToOne;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -21,13 +19,15 @@ public class Transaction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "transaction_id")
-	private Long transactionId;
+	private Integer id;
 
-	@Column(name = "fk_issuer_id")
-	private Long issuerId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fk_issuer_id")
+	private User issuer;
 
-	@Column(name = "fk_payee_id")
-	private Long payeeId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fk_payee_id")
+	private User payee;
 
 	private LocalDateTime date;
 

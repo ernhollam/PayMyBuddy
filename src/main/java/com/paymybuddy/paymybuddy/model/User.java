@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -23,7 +22,7 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
-	private Long userId;
+	private Integer id;
 
 	private String email;
 
@@ -38,15 +37,15 @@ public class User {
 	@Column(name = "balance")
 	private BigDecimal balance;
 
-	@OneToMany(mappedBy = "initializerId")
-	Set<Connection> initializedConnections;
+	@OneToMany(mappedBy = "initializer")
+	private List<Connection> initializedConnections = new ArrayList<>();
 
-	@OneToMany(mappedBy = "receiverId")
-	Set<Connection> receivedConnections;
+	@OneToMany(mappedBy = "receiver")
+	private List<Connection> receivedConnections = new ArrayList<>();
 
-	@OneToMany(mappedBy = "issuerId")
-	Set<Transaction> initiatedTransactions;
+	@OneToMany(mappedBy = "issuer")
+	private List<Transaction> initiatedTransactions = new ArrayList<>();
 
-	@OneToMany(mappedBy = "payeeId")
-	Set<Transaction> receivedTransactions;
+	@OneToMany(mappedBy = "payee")
+	private List<Transaction> receivedTransactions = new ArrayList<>();
 }
