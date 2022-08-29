@@ -18,13 +18,15 @@ public class Connection {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "connection_id")
-	private Long connectionId;
+	private Integer id;
 
-	@Column(name = "fk_initializer_id")
-	private Long initializerId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fk_initializer_id")
+	private User initializer;
 
-	@Column(name = "fk_receiver_id")
-	private Long receiverId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fk_receiver_id")
+	private User receiver;
 
 	private LocalDateTime startingDate;
 }
