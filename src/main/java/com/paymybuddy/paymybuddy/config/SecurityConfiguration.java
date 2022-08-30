@@ -11,23 +11,23 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-	/**
-	 * Spring Security needs to have a PasswordEncoder defined.
-	 * @return PasswordEncoder that uses the BCrypt
-	 */
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    /**
+     * Spring Security needs to have a PasswordEncoder defined.
+     *
+     * @return PasswordEncoder that uses the BCrypt
+     */
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Override
-	public void configure(HttpSecurity http) throws Exception {
-		// Allow users with ADMIN role only to access /admin page
-		http
-				.authorizeRequests()
-				.anyRequest().authenticated()
-				.and()
-				.formLogin();
-	}
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        // Allow users with ADMIN role only to access /admin page
+        http.authorizeRequests()
+            .anyRequest().authenticated()
+            .and()
+            .formLogin();
+    }
 
 }
