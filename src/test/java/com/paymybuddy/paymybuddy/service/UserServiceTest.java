@@ -195,4 +195,23 @@ class UserServiceTest {
     }
 
 
+    @Test
+    @DisplayName("Load by username should use email as username")
+    void loadUserByUsername_shouldUse_emailAsUsername() {
+        doReturn(Optional.of(testUser))
+                .when(userRepository).findByEmail(any(String.class));
+
+        userService.loadUserByUsername(testUser.getEmail());
+
+        verify(userRepository, times(1)).findByEmail(testUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("Load by username should should throw exception when email not found")
+    void loadUserByUsername_shouldThrow_buddyNotFoundException() {
+        doReturn(Optional.empty())
+                .when(userRepository).findByEmail(any(String.class));
+
+        assertThrows(BuddyNotFoundException.class, () -> userService.loadUserByUsername(testUser.getEmail()));
+    }
 }

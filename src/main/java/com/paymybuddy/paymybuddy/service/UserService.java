@@ -5,9 +5,13 @@ import com.paymybuddy.paymybuddy.constants.Fee;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.UserPrincipal;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +23,7 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService {
 
     /**
      * Instance of UserRepository.
@@ -68,7 +72,6 @@ public class UserService {
             }
         }
     }
-
 
 
     /**
@@ -156,7 +159,10 @@ public class UserService {
 
     /**
      * Email validator.
-     * @param emailAddress email address to validate
+     *
+     * @param emailAddress
+     *         email address to validate
+     *
      * @return true if valid, false otherwise.
      */
     public static boolean isInvalidEmail(String emailAddress) {
@@ -164,6 +170,7 @@ public class UserService {
                        .matcher(emailAddress)
                        .matches();
     }
+
     /**
      * Deposits money to buddy account.
      */
@@ -182,5 +189,12 @@ public class UserService {
         amount = amount.replace("-", "");
 
         user.setBalance(user.getBalance().subtract(new BigDecimal(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP)));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        var user = userRepository.findByEmail(username);
+        if (user.isEmpty()) throw new BuddyNotFoundException("No buddy found for email: " + username + ".");
+        return new UserPrincipal(user.get());
     }
 }
