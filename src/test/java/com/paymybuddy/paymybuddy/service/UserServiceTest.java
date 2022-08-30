@@ -91,7 +91,6 @@ class UserServiceTest {
         // WHEN
         userService.createUser(testUser);
         // THEN
-        // TODO confirmer lors de la session : pourquoi id = null lors des tests in-memory ?
         // asserting that created user is not null does not work, thus we check if the balance was actually set to
         // 0.00 during user creation
         verify(userRepository, times(1)).save(testUser);
