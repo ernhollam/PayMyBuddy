@@ -23,6 +23,7 @@ public class UrlConfig implements WebMvcConfigurer {
 	public static final String WITHDRAW_SUCCESS                = "/profile?withdrew";
 	public static final String CONTACT_US                      = "/contact";
 	public static final String LOGOUT                          = "/logout";
+	public static final String ACCESS_DENIED                   = "/403";
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
