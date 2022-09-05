@@ -21,84 +21,89 @@ import java.util.Optional;
 @Slf4j
 public class ConnectionService {
 
-	@Autowired
-	ConnectionRepository connectionRepository;
+    @Autowired
+    ConnectionRepository connectionRepository;
 
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	Clock          clock;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    Clock          clock;
 
-	public List<User> getUserConnections(User user) {
-		Integer    userId      = user.getId();
-		List<User> connections = new ArrayList<>();
-		// Get all connections where user is involved
-		List<Connection> connectionsWhereUserIsInvolved = connectionRepository
-				.findByInitializerOrReceiver(user, user);
-		log.debug("Found connections involving " + user.getEmail() + ":\n" + connectionsWhereUserIsInvolved);
-		// If user was initializer, then add the receiver to list and vice versa
-		for (Connection connection : connectionsWhereUserIsInvolved) {
-			User initializer = connection.getInitializer();
-			User receiver    = connection.getReceiver();
-			if (userId.equals(initializer.getId())) {
-				connections.add(receiver);
-			} else if (userId.equals(receiver.getId())) {
-				connections.add(initializer);
-			}
-		}
-		log.info("Connections for " + user.getEmail() + ":\n" + connections);
-		return connections;
-	}
+    public List<User> getUserConnections(User user) {
+        Integer    userId      = user.getId();
+        List<User> connections = new ArrayList<>();
+        // Get all connections where user is involved
+        List<Connection> connectionsWhereUserIsInvolved = connectionRepository
+                .findByInitializerOrReceiver(user, user);
+        log.debug("Found connections involving " + user.getEmail() + ":\n" + connectionsWhereUserIsInvolved);
+        // If user was initializer, then add the receiver to list and vice versa
+        for (Connection connection : connectionsWhereUserIsInvolved) {
+            User initializer = connection.getInitializer();
+            User receiver    = connection.getReceiver();
+            if (userId.equals(initializer.getId())) {
+                connections.add(receiver);
+            } else if (userId.equals(receiver.getId())) {
+                connections.add(initializer);
+            }
+        }
+        log.info("Connections for " + user.getEmail() + ":\n" + connections);
+        return connections;
+    }
 
-	@Transactional
-	public Connection addConnection(User initializer, String email) {
-		if (UserService.isInvalidEmail(email)) {
-			String invalidEmailMessage = "The email provided is invalid.";
-			log.error(invalidEmailMessage);
-			throw new IllegalArgumentException(invalidEmailMessage);
-		} else {
-			Optional<User> optionalReceiver = userRepository.findByEmail(email);
-			if (optionalReceiver.isEmpty()) {
-				// Check if a user with specified email exists
-				String errorMessage = "Email " + email + " does not match any buddy.";
-				log.error(errorMessage);
-				throw new BuddyNotFoundException(errorMessage);
-			} else {
-				User receiver = optionalReceiver.get();
-				if (getUserConnections(initializer).contains(receiver)) {
-					String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
-										  "of yours!.";
-					log.error(errorMessage);
-					throw new AlreadyABuddyException(errorMessage);
-				} else {
-					// Create connection with both users
-					Connection connection = new Connection();
-					connection.setInitializer(initializer);
-					connection.setReceiver(receiver);
-					connection.setStartingDate(LocalDateTime.now(clock));
-					// Add connection to initializer's initiatedConnections
-					initializer.getInitializedConnections().add(connection);
-					// Add connection to receiver's receivedConnections
-					receiver.getReceivedConnections().add(connection);
-					return saveConnection(connection);
-				}
-			}
-		}
+    @Transactional
+    public Connection addConnection(User initializer, String email) {
+        if (UserService.isInvalidEmail(email)) {
+            String invalidEmailMessage = "The email provided is invalid.";
+            log.error(invalidEmailMessage);
+            throw new IllegalArgumentException(invalidEmailMessage);
+        }
 
-	}
-	@Transactional
-	public Connection saveConnection(Connection connection) {
-		return connectionRepository.save(connection);
-	}
+        Optional<User> optionalReceiver = userRepository.findByEmail(email);
+        if (optionalReceiver.isEmpty()) {
+            // Check if a user with specified email exists
+            String errorMessage = "Email " + email + " does not match any buddy.";
+            log.error(errorMessage);
+            throw new BuddyNotFoundException(errorMessage);
+        } else {
+            User receiver = optionalReceiver.get();
+            if (getUserConnections(initializer).contains(receiver)) {
+                String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
+                                      "of yours!.";
+                log.error(errorMessage);
+                throw new AlreadyABuddyException(errorMessage);
+            } else {
+                // Create connection with both users					;
+                return saveConnection(createConnection(initializer, receiver));
+            }
+        }
 
-	@Transactional
-	public void deleteInitiatedConnections(User user) {
-		connectionRepository.deleteByInitializer(user);
-	}
+    }
 
-	@Transactional
-	public void deleteReceivedConnections(User user) {
-		connectionRepository.deleteByReceiver(user);
-	}
+    protected Connection createConnection(User initializer, User receiver) {
+        Connection connection = new Connection();
+        connection.setInitializer(initializer);
+        connection.setReceiver(receiver);
+        connection.setStartingDate(LocalDateTime.now(clock));
+        // Add connection to initializer's initiatedConnections
+        initializer.getInitializedConnections().add(connection);
+        // Add connection to receiver's receivedConnections
+        receiver.getReceivedConnections().add(connection);
+        return connection;
+    }
+
+    @Transactional
+    public Connection saveConnection(Connection connection) {
+        return connectionRepository.save(connection);
+    }
+
+    @Transactional
+    public void deleteInitiatedConnections(User user) {
+        connectionRepository.deleteByInitializer(user);
+    }
+
+    @Transactional
+    public void deleteReceivedConnections(User user) {
+        connectionRepository.deleteByReceiver(user);
+    }
 
 }
