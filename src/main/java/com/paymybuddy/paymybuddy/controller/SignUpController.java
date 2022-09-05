@@ -18,13 +18,13 @@ public class SignUpController {
 	@Autowired UserService userService;
 
 	@GetMapping
-	public String showSignUpForm(User user) {
+	public String showSignUpForm() {
 		return "signup";
 	}
 
 	@PostMapping
-	public String submit(User user, BindingResult result, Model model) {
-		User savedUser = userService.createUser(user);
+	public String submit(String email, String password, BindingResult result, Model model) {
+		User savedUser = userService.createUser(email, password);
 
 		if (result.hasErrors()) return "signup";
 		return "redirect:/login";

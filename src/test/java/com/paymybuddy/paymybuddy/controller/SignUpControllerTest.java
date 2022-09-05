@@ -48,7 +48,7 @@ class SignUpControllerTest {
 	@Test
 	@DisplayName("Clicking on submit with right information should redirect to login page")
 	void submit() throws Exception {
-		when(userService.createUser(any(User.class))).thenReturn(testUser);
+		when(userService.createUser(any(String.class), any(String.class))).thenReturn(testUser);
 		String BASE_URL = "http://localhost";
 		mockMvc.perform(post(SIGNUP)
 						.param("user", testUser.toString())
