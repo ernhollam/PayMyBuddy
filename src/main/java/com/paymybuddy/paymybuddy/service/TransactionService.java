@@ -36,50 +36,48 @@ public class TransactionService {
     public Transaction createTransaction(User issuer, User payee, String description, double amount) {
         // Check that amount is not negative nor 0
         if (amount < 0) {
-            String errorMessage = "Transaction amount can not be negative.";
-            log.error(errorMessage);
+            String errorMessage = "Transaction amount can not be negative."; log.error(errorMessage);
             throw new InvalidAmountException(errorMessage);
-        } else if (amount == 0) {
-            String errorMessage = "Transaction amount must be more than 0.";
-            log.error(errorMessage);
+        }
+        if (amount == 0) {
+            String errorMessage = "Transaction amount must be more than 0."; log.error(errorMessage);
             throw new InvalidAmountException(errorMessage);
         }
         // Calculate fee and total amount
         double fee = amount * Fee.TRANSACTION_FEE;
-        BigDecimal amountWithFee = new BigDecimal(Double.toString(amount + fee)).setScale(Fee.SCALE,
-                                                                                          RoundingMode.HALF_UP);
+        BigDecimal amountWithFee = new BigDecimal(Double.toString(amount + fee))
+                .setScale(Fee.SCALE, RoundingMode.HALF_UP);
         // Check that issuer has enough money for this transaction
         if (issuer.getBalance().compareTo(amountWithFee) < 0) {
-            String errorMessage = "Issuer has insufficient balance to make this transfer.";
-            log.error(errorMessage);
+            String errorMessage = "Issuer has insufficient balance to make this transfer."; log.error(errorMessage);
             throw new InsufficientBalanceException(errorMessage);
         }
-        if (connectionService.getUserConnections(issuer).contains(payee)) {
-            // Withdraw amount with applied fee from issuer's balance
-            issuer.setBalance(issuer.getBalance().subtract(amountWithFee));
-            // Credit payee
-            BigDecimal transactionAmount = new BigDecimal(Double.toString(amount))
-                    .setScale(Fee.SCALE, RoundingMode.HALF_UP);
-            payee.setBalance(
-                    payee.getBalance().add(BigDecimal.valueOf(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP)));
-            // Update transaction with all information before saving
-            Transaction transaction = new Transaction();
-            transaction.setIssuer(issuer);
-            transaction.setPayee(payee);
-            transaction.setAmount(transactionAmount);
-            transaction.setDate(LocalDateTime.now(clock));
-            transaction.setDescription(description);
-
-            issuer.getInitiatedTransactions().add(transaction);
-            payee.getReceivedTransactions().add(transaction);
-
-            return transactionRepository.save(transaction);
-        } else {
+        // Check that buddy is making a transaction with a connection
+        if (!connectionService.getUserConnections(issuer).contains(payee)) {
             String errorMessage = "The payee is not a buddy from issuer.";
             log.error(errorMessage);
             throw new InvalidPayeeException(errorMessage);
         }
+        // Withdraw amount with applied fee from issuer's balance
+        issuer.setBalance(issuer.getBalance().subtract(amountWithFee));
+        // Credit payee
+        BigDecimal transactionAmount = new BigDecimal(Double.toString(amount))
+                .setScale(Fee.SCALE, RoundingMode.HALF_UP);
+        payee.setBalance(payee.getBalance()
+                              .add(BigDecimal.valueOf(amount)
+                                             .setScale(Fee.SCALE, RoundingMode.HALF_UP)));
+        // Update transaction with all information before saving
+        Transaction transaction = new Transaction();
+        transaction.setIssuer(issuer);
+        transaction.setPayee(payee);
+        transaction.setAmount(transactionAmount);
+        transaction.setDate(LocalDateTime.now(clock));
+        transaction.setDescription(description);
 
+        issuer.getInitiatedTransactions().add(transaction);
+        payee.getReceivedTransactions().add(transaction);
+
+        return transactionRepository.save(transaction);
     }
 
     /**
