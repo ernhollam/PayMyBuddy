@@ -64,17 +64,16 @@ public class ConnectionService {
             String errorMessage = "Email " + email + " does not match any buddy.";
             log.error(errorMessage);
             throw new BuddyNotFoundException(errorMessage);
+        }
+        User receiver = optionalReceiver.get();
+        if (getUserConnections(initializer).contains(receiver)) {
+            String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
+                                  "of yours!.";
+            log.error(errorMessage);
+            throw new AlreadyABuddyException(errorMessage);
         } else {
-            User receiver = optionalReceiver.get();
-            if (getUserConnections(initializer).contains(receiver)) {
-                String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
-                                      "of yours!.";
-                log.error(errorMessage);
-                throw new AlreadyABuddyException(errorMessage);
-            } else {
-                // Create connection with both users					;
-                return saveConnection(createConnection(initializer, receiver));
-            }
+            // Create connection with both users					;
+            return saveConnection(createConnection(initializer, receiver));
         }
 
     }
