@@ -25,12 +25,12 @@ public class SignUpController {
 
 	@PostMapping
 	public String submit(@RequestParam String email, @RequestParam String password,
-			BindingResult result, Model model) {
+						BindingResult result, Model model) {
 		User newUser = new User();
 		newUser.setEmail(email);
 		newUser.setPassword(password);
 
-		User savedUser = userService.createUser(newUser);
+		User savedUser = userService.createUser(email, password);
 
 		if (result.hasErrors()) return "signup";
 		return "redirect:/login";

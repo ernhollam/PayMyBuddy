@@ -55,18 +55,18 @@ class UserServiceTest {
     @DisplayName("Saving user with valid email should create new user")
     public void createUser_usingValidEmail_shouldCreate_newUser() {
         String emailAddress = "username@domain.com";
+        String password = "ABCDEF123";
         testUser.setEmail(emailAddress);
         doReturn(Optional.empty())
                 .when(userRepository).findByEmail(emailAddress);
         when(passwordEncoder.encode(any(String.class)))
-                .thenReturn("ABCDEF123");
+                .thenReturn(password);
         doReturn(testUser)
                 .when(userRepository).save(any(User.class));
 
-        userService.createUser(testUser);
+        testUser = userService.createUser(emailAddress, password);
 
-        verify(userRepository, times(1)).save(testUser);
-        assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("0.00"));
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
@@ -75,7 +75,7 @@ class UserServiceTest {
         String emailAddress = "username@domain";
         testUser.setEmail(emailAddress);
 
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(testUser));
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser("username@domain", "123"));
     }
 
     @Test
@@ -89,12 +89,11 @@ class UserServiceTest {
         doReturn(testUser)
                 .when(userRepository).save(any(User.class));
         // WHEN
-        userService.createUser(testUser);
+        testUser = userService.createUser("username@domain.com", "ABCDEF123");
         // THEN
         // asserting that created user is not null does not work, thus we check if the balance was actually set to
         // 0.00 during user creation
-        verify(userRepository, times(1)).save(testUser);
-        assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("0.00"));
+        verify(userRepository, times(1)).save(any(User.class));
         assertThat(testUser).isNotNull();
     }
 
@@ -158,7 +157,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(any(String.class)))
                 .thenReturn(Optional.of(testUser));
         // THEN
-        assertThrows(EmailAlreadyUsedException.class, () -> userService.createUser(testUser));
+        assertThrows(EmailAlreadyUsedException.class, () -> userService.createUser("username@domain.com", "ABCDEF123"));
     }
 
     @Test

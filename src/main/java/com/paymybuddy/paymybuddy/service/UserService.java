@@ -46,31 +46,32 @@ public class UserService implements UserDetailsService {
     /**
      * Saves user to database.
      *
-     * @param user
-     *         User  to save.
+     * @param email valid email from user to save
+     * @param password user's password
      *
      * @return User with id.
      */
     @Transactional
-    public User createUser(User user) {
-        if (isInvalidEmail(user.getEmail())) {
+    public User createUser(String email, String password) {
+        if (isInvalidEmail(email)) {
             String invalidEmailMessage = "The email provided is invalid.";
             log.error(invalidEmailMessage);
             throw new IllegalArgumentException(invalidEmailMessage);
-        } else {
-            // Detect if email is already used
-            Optional<User> existingUserWithEmail = userRepository.findByEmail(user.getEmail());
-            if (existingUserWithEmail.isPresent()) {
-                String errorMessage = "Email " + user.getEmail() + " is already used." +
-                                      "Please sign in with another email.";
-                log.error(errorMessage);
-                throw new EmailAlreadyUsedException(errorMessage);
-            } else {
-                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-                user.setBalance(new BigDecimal("0.00"));
-                return userRepository.save(user);
-            }
         }
+
+        // Detect if email is already used
+        Optional<User> existingUserWithEmail = userRepository.findByEmail(email);
+        if (existingUserWithEmail.isPresent()) {
+            String errorMessage = "Email " + email + " is already used." +
+                                  "Please sign in with another email.";
+            log.error(errorMessage);
+            throw new EmailAlreadyUsedException(errorMessage);
+        }
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+        user.setBalance(new BigDecimal("0.00"));
+        return userRepository.save(user);
     }
 
 
@@ -193,9 +194,14 @@ public class UserService implements UserDetailsService {
 
     /**
      * Uses email as username for sign up.
-     * @param username email
+     *
+     * @param username
+     *         email
+     *
      * @return a UserPrincipal object
-     * @throws UsernameNotFoundException when email not found
+     *
+     * @throws UsernameNotFoundException
+     *         when email not found
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

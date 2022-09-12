@@ -15,6 +15,7 @@ import static com.paymybuddy.paymybuddy.config.UrlConfig.LOGIN;
 import static com.paymybuddy.paymybuddy.config.UrlConfig.SIGNUP;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -51,12 +52,12 @@ class SignUpControllerTest {
 	@Test
 	@DisplayName("Clicking on submit with right information should redirect to login page")
 	void submit() throws Exception {
-		when(userService.createUser(any(User.class))).thenReturn(testUser);
+		when(userService.createUser(any(String.class), any(String.class))).thenReturn(testUser);
 		String BASE_URL = "http://localhost";
 		mockMvc.perform(post(SIGNUP)
 						.param("email", email)
-						.param("password", password))
-						//.with(csrf()))
+						.param("password", password)
+						.with(csrf()))
 				.andDo(print())
 				.andExpect(status().isFound())
 				.andExpect(redirectedUrl(BASE_URL + LOGIN));
