@@ -15,7 +15,6 @@ import static com.paymybuddy.paymybuddy.config.UrlConfig.LOGIN;
 import static com.paymybuddy.paymybuddy.config.UrlConfig.SIGNUP;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -28,13 +27,17 @@ class SignUpControllerTest {
 	@Autowired MockMvc     mockMvc;
 	@MockBean  UserService userService;
 
-	private       User   testUser;
+	private String email;
+	private String password;
+	private User   testUser;
 
 	@BeforeAll
 	void init() {
 		testUser = new User();
-		testUser.setEmail("abc@domain.com");
-		testUser.setPassword("rawPassword");
+		email    = "abc@domain.com";
+		password = "rawPassword";
+		testUser.setEmail(email);
+		testUser.setPassword(password);
 	}
 
 	@Test
@@ -51,8 +54,9 @@ class SignUpControllerTest {
 		when(userService.createUser(any(User.class))).thenReturn(testUser);
 		String BASE_URL = "http://localhost";
 		mockMvc.perform(post(SIGNUP)
-						.param("user", testUser.toString())
-						.with(csrf()))
+						.param("email", email)
+						.param("password", password))
+						//.with(csrf()))
 				.andDo(print())
 				.andExpect(status().isFound())
 				.andExpect(redirectedUrl(BASE_URL + LOGIN));
