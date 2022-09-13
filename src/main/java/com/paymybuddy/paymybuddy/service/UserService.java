@@ -5,25 +5,23 @@ import com.paymybuddy.paymybuddy.constants.Fee;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
-import com.paymybuddy.paymybuddy.model.UserPrincipal;
+import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class UserService implements UserDetailsService {
+public class UserService {
 
     /**
      * Instance of UserRepository.
@@ -31,23 +29,18 @@ public class UserService implements UserDetailsService {
     @Autowired
     private final UserRepository userRepository;
 
-    /**
-     * Password encoder.
-     */
-    @Autowired
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserService(UserRepository userRepository,
-                       BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     /**
      * Saves user to database.
      *
-     * @param email valid email from user to save
-     * @param password user's password
+     * @param email
+     *         valid email from user to save
+     * @param password
+     *         user's password
      *
      * @return User with id.
      */
@@ -69,7 +62,7 @@ public class UserService implements UserDetailsService {
         }
         User user = new User();
         user.setEmail(email);
-        user.setPassword(bCryptPasswordEncoder.encode(password));
+        user.setPassword(password);
         user.setBalance(new BigDecimal("0.00"));
         return userRepository.save(user);
     }
@@ -80,8 +73,15 @@ public class UserService implements UserDetailsService {
      *
      * @return a set of users.
      */
-    public Iterable<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserViewModel> getUsers() {
+        Iterable<User>      users          = userRepository.findAll();
+        List<UserViewModel> usersViewModel = new ArrayList<>();
+        // extract info from user to user view model
+        users.forEach(user -> usersViewModel.add(new UserViewModel(user.getEmail(), user.getFirstName(),
+                                                               user.getLastName(),
+                                                               user.getBalance())));
+
+        return usersViewModel;
     }
 
     /**
@@ -96,19 +96,6 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id);
     }
 
-    /**
-     * Finds a user by their first and last names.
-     *
-     * @param firstName
-     *         User's first name.
-     * @param lastName
-     *         User's last name.
-     *
-     * @return optional user.
-     */
-    public Optional<User> getUserByName(String firstName, String lastName) {
-        return userRepository.findByFirstNameAndLastName(firstName, lastName);
-    }
 
     /**
      * Finds a user by their email address.
@@ -150,12 +137,12 @@ public class UserService implements UserDetailsService {
     /**
      * Deletes user.
      *
-     * @param user
-     *         User to delete.
+     * @param id
+     *         user is to delete
      */
     @Transactional
-    public void deleteUser(User user) {
-        userRepository.delete(user);
+    public void deleteUserById(Integer id) {
+        userRepository.deleteById(id);
     }
 
     /**
@@ -190,23 +177,5 @@ public class UserService implements UserDetailsService {
         amount = amount.replace("-", "");
 
         user.setBalance(user.getBalance().subtract(new BigDecimal(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP)));
-    }
-
-    /**
-     * Uses email as username for sign up.
-     *
-     * @param username
-     *         email
-     *
-     * @return a UserPrincipal object
-     *
-     * @throws UsernameNotFoundException
-     *         when email not found
-     */
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = userRepository.findByEmail(username);
-        if (user.isEmpty()) throw new BuddyNotFoundException("No buddy found for email: " + username + ".");
-        return new UserPrincipal(user.get());
     }
 }

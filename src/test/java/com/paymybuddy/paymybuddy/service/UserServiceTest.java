@@ -3,6 +3,7 @@ package com.paymybuddy.paymybuddy.service;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -40,6 +42,7 @@ class UserServiceTest {
     BCryptPasswordEncoder passwordEncoder;
 
     private User testUser;
+    private User otherUser;
 
     @BeforeEach
     public void initUsers() {
@@ -49,13 +52,20 @@ class UserServiceTest {
         testUser.setPassword("CouldIBeAnyMoreBored");
         testUser.setEmail("bingchandler@friends.com");
         testUser.setBalance(new BigDecimal("2509.56"));
+
+        otherUser = new User();
+        otherUser.setFirstName("Joey");
+        otherUser.setLastName("Tribbiani");
+        otherUser.setPassword("HowUDoin");
+        otherUser.setEmail("otheremail@mail.com");
+
     }
 
     @Test
     @DisplayName("Saving user with valid email should create new user")
     public void createUser_usingValidEmail_shouldCreate_newUser() {
         String emailAddress = "username@domain.com";
-        String password = "ABCDEF123";
+        String password     = "ABCDEF123";
         testUser.setEmail(emailAddress);
         doReturn(Optional.empty())
                 .when(userRepository).findByEmail(emailAddress);
@@ -192,24 +202,22 @@ class UserServiceTest {
         assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("2000.00"));
     }
 
-
     @Test
-    @DisplayName("Load by username should use email as username")
-    void loadUserByUsername_shouldUse_emailAsUsername() {
-        doReturn(Optional.of(testUser))
-                .when(userRepository).findByEmail(any(String.class));
+    @DisplayName("getUsers should return a list of User with their email, first and last names, and balance " +
+                 "information")
+    void getUsers_shouldReturn_listOfUserViewModels() {
+        when(userRepository.findAll()).thenReturn(List.of(testUser, otherUser));
 
-        userService.loadUserByUsername(testUser.getEmail());
+        List<UserViewModel> result = userService.getUsers();
 
-        verify(userRepository, times(1)).findByEmail(testUser.getEmail());
-    }
+        assertTrue(result.get(0).getEmail().equalsIgnoreCase(testUser.getEmail()));
+        assertTrue(result.get(0).getFirstname().equalsIgnoreCase(testUser.getFirstName()));
+        assertTrue(result.get(0).getLastname().equalsIgnoreCase(testUser.getLastName()));
+        assertThat(result.get(0).getBalance()).isEqualTo(testUser.getBalance());
 
-    @Test
-    @DisplayName("Load by username should should throw exception when email not found")
-    void loadUserByUsername_shouldThrow_buddyNotFoundException() {
-        doReturn(Optional.empty())
-                .when(userRepository).findByEmail(any(String.class));
-
-        assertThrows(BuddyNotFoundException.class, () -> userService.loadUserByUsername(testUser.getEmail()));
+        assertTrue(result.get(1).getEmail().equalsIgnoreCase(otherUser.getEmail()));
+        assertTrue(result.get(1).getFirstname().equalsIgnoreCase(otherUser.getFirstName()));
+        assertTrue(result.get(1).getLastname().equalsIgnoreCase(otherUser.getLastName()));
+        assertThat(result.get(1).getBalance()).isEqualTo(otherUser.getBalance());
     }
 }
