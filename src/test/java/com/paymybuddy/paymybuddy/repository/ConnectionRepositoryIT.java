@@ -80,28 +80,4 @@ class ConnectionRepositoryIT {
         //THEn a connection should be found
         assertTrue(connection.isEmpty());
     }
-
-    @Test
-    @DisplayName("deleteByInitializer should delete connection when it exists")
-    void deleteByInitializer_shouldDeleteConnection() {
-        //GIVEN an existing connection
-        Connection connectionToDelete = connectionRepository.save(connection);
-        assertTrue(connectionRepository.existsById(connectionToDelete.getId()));
-        // WHEN deleting connection
-        connectionRepository.deleteByInitializer(connection.getInitializer());
-        //THEn the connection should not be found
-        assertTrue(connectionRepository.findById(connectionToDelete.getId()).isEmpty());
-    }
-
-    @Test
-    @DisplayName("deleteByReceiver should delete a connection")
-    void deleteByReceiver_shouldDeleteConnection() {
-        //GIVEN an existing connection
-        Connection connectionToDelete = connectionRepository.save(connection);
-        assertTrue(connectionRepository.existsById(connectionToDelete.getId()));
-        // WHEN deleting connection
-        connectionRepository.deleteByReceiver(connection.getReceiver());
-        //THEn the connection should not be found
-        assertTrue(connectionRepository.findById(connectionToDelete.getId()).isEmpty());
-    }
 }

@@ -60,29 +60,18 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PutMapping("/{id}/profile/password")
-    public User updateUser(@PathVariable Integer id, @RequestParam String password) {
-        User user = getUser(id);
-        user.setPassword(password);
-        return userService.updateUser(user);
-    }
 
-    @PutMapping("/{id}/profile/deposit")
+    @PutMapping("/{id}/deposit")
     public void deposit(@PathVariable Integer id, @RequestParam String amount) {
         userService.deposit(getUser(id), amount);
     }
 
 
-    @PutMapping("/{id}/profile/withdraw")
+    @PutMapping("/{id}/withdraw")
     public void withdraw(@PathVariable Integer id, @RequestParam String amount) {
         userService.withdraw(getUser(id), amount);
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable Integer id) {
-        userService.deleteUserById(id);
-    }
 
 
     protected User getUser(Integer id) {

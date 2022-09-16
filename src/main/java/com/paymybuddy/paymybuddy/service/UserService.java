@@ -2,7 +2,6 @@ package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.constants.EmailValidator;
 import com.paymybuddy.paymybuddy.constants.Fee;
-import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
@@ -109,41 +108,6 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    /**
-     * Updates a user.
-     *
-     * @param user
-     *         User to update.
-     *
-     * @return Updated user.
-     */
-    public User updateUser(User user) {
-        if (isInvalidEmail(user.getEmail())) {
-            String invalidEmailMessage = "The email provided is invalid.";
-            log.error(invalidEmailMessage);
-            throw new IllegalArgumentException(invalidEmailMessage);
-        } else {
-            Optional<User> userToUpdate = userRepository.findByEmail(user.getEmail());
-            if (userToUpdate.isEmpty()) {
-                String errorMessage = "The user you are trying to update does not exist.";
-                log.error(errorMessage);
-                throw new BuddyNotFoundException(errorMessage);
-            } else {
-                return userRepository.save(user);
-            }
-        }
-    }
-
-    /**
-     * Deletes user.
-     *
-     * @param id
-     *         user is to delete
-     */
-    @Transactional
-    public void deleteUserById(Integer id) {
-        userRepository.deleteById(id);
-    }
 
     /**
      * Email validator.
@@ -167,6 +131,7 @@ public class UserService {
         amount = amount.replace("-", "");
 
         user.setBalance(user.getBalance().add(new BigDecimal(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP)));
+        userRepository.save(user);
     }
 
     /**
@@ -177,5 +142,6 @@ public class UserService {
         amount = amount.replace("-", "");
 
         user.setBalance(user.getBalance().subtract(new BigDecimal(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP)));
+        userRepository.save(user);
     }
 }

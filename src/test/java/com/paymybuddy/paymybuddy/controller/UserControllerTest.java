@@ -38,6 +38,7 @@ class UserControllerTest {
     @BeforeEach
     public void initUsers() {
         testUser = new User();
+        testUser.setId(150);
         testUser.setFirstName("Chandler");
         testUser.setLastName("Bing");
         testUser.setPassword("CouldIBeAnyMoreBored");
@@ -81,13 +82,16 @@ class UserControllerTest {
                .andExpect(jsonPath("$", hasSize(2)));
     }
 
-    @Test
-    void getUserByEmail() {
-    }
 
-    @Test
-    void getUserById() {
-    }
+/*    @Test
+    void getUserById() throws Exception {
+        when(userService.getUserById(any(Integer.class)))
+                .thenReturn(Optional.ofNullable(testUser));
+        mockMvc.perform(get("/user/"+testUser.getId()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].user_id"), is(testUser.getId()));
+    }*/
 
     @Test
     void updateUser() {

@@ -1,6 +1,5 @@
 package com.paymybuddy.paymybuddy.service;
 
-import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
@@ -107,58 +106,6 @@ class UserServiceTest {
         assertThat(testUser).isNotNull();
     }
 
-    @Test
-    @DisplayName("Updating user with valid email should update user")
-    public void updateUser_usingValidEmail_shouldUpdate_user() {
-        String emailAddress = "username@domain.com";
-        testUser.setEmail(emailAddress);
-        testUser.setBalance(new BigDecimal("3000.00"));
-        doReturn(Optional.of(testUser))
-                .when(userRepository).findByEmail(emailAddress);
-        when(passwordEncoder.encode(any(String.class)))
-                .thenReturn("ABCDEF123");
-        doReturn(testUser)
-                .when(userRepository).save(any(User.class));
-
-        userService.updateUser(testUser);
-
-        verify(userRepository, times(1)).save(testUser);
-        assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("3000.00"));
-        assertTrue(testUser.getEmail().equalsIgnoreCase(emailAddress));
-    }
-
-    @Test
-    @DisplayName("Updating user with invalid email should throw exception")
-    public void updateUser_usingValidEmail_shouldThrow_exception() {
-        String emailAddress = "username@domain";
-        testUser.setEmail(emailAddress);
-
-        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(testUser));
-    }
-
-    @Test
-    @DisplayName("Updating a non-existing user should throw an exception")
-    void updateUser_shouldThrowException_whenEmailNotFound() {
-        when(userRepository.findByEmail(any(String.class)))
-                .thenReturn(Optional.empty());
-        // THEN
-        assertThrows(BuddyNotFoundException.class, () -> userService.updateUser(testUser));
-    }
-
-    @Test
-    @DisplayName("Updating user's lastname should update last name")
-    void updateUser() {
-        doReturn(Optional.of(testUser))
-                .when(userRepository).findByEmail(any(String.class));
-        String lastNameAfter = "Bing-Geller";
-        testUser.setLastName(lastNameAfter);
-        doReturn(testUser)
-                .when(userRepository).save(testUser);
-
-        testUser = userService.updateUser(testUser);
-        // THEN
-        assertTrue(testUser.getLastName().equalsIgnoreCase(lastNameAfter));
-    }
 
     @Test
     @DisplayName("Saving a user with already existing email should throw exception")
@@ -175,6 +122,7 @@ class UserServiceTest {
     void deposit_shouldAdd_amount() {
         String amount = "490.44";
         userService.deposit(testUser, amount);
+        verify(userRepository, times(1)).save(testUser);
         assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("3000.00"));
     }
 
@@ -191,6 +139,7 @@ class UserServiceTest {
     void withdraw_shouldWithdraw_amount() {
         String amount = "509.56";
         userService.withdraw(testUser, amount);
+        verify(userRepository, times(1)).save(testUser);
         assertThat(testUser.getBalance()).isEqualTo("2000.00");
     }
 

@@ -95,14 +95,5 @@ public class ConnectionService {
         return connectionRepository.save(connection);
     }
 
-    @Transactional
-    public void deleteInitiatedConnections(User user) {
-        connectionRepository.deleteByInitializer(user);
-    }
-
-    @Transactional
-    public void deleteReceivedConnections(User user) {
-        connectionRepository.deleteByReceiver(user);
-    }
 
 }
