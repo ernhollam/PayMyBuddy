@@ -55,6 +55,7 @@ class TransactionServiceTest {
     @BeforeAll
     void initUsers() {
         issuer = new User();
+        issuer.setId(1);
         issuer.setFirstName("Chandler");
         issuer.setLastName("Bing");
         issuer.setPassword("CouldIBeAnyMoreBored");
@@ -62,6 +63,7 @@ class TransactionServiceTest {
         issuer.setBalance(new BigDecimal(500));
 
         payee = new User();
+        payee.setId(2);
         payee.setFirstName("Joey");
         payee.setLastName("Tribbiani");
         payee.setPassword("HowUDoin");

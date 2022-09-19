@@ -13,6 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserViewModel {
+    private Integer    id;
     private String     email;
     private String     firstname;
     private String     lastname;
@@ -24,7 +25,8 @@ public class UserViewModel {
         if (o == null || getClass() != o.getClass()) return false;
         UserViewModel userViewModel = (UserViewModel) o;
         if (userViewModel.balance == null) userViewModel.balance = new BigDecimal("0.00"); // add check of null value
-        return (email.equalsIgnoreCase(userViewModel.email) &&
+        return (id.equals(userViewModel.id) &&
+                email.equalsIgnoreCase(userViewModel.email) &&
                 firstname.equalsIgnoreCase(userViewModel.firstname) &&
                 lastname.equalsIgnoreCase(userViewModel.lastname) &&
                 balance.equals(userViewModel.balance));
@@ -32,6 +34,6 @@ public class UserViewModel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, firstname, lastname, balance);
+        return Objects.hash(id, email, firstname, lastname, balance);
     }
 }
