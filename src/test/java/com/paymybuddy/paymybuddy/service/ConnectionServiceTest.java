@@ -26,7 +26,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @Import(ConnectionService.class)
@@ -115,7 +115,7 @@ class ConnectionServiceTest {
     public void updateUser_usingValidEmail_shouldThrow_exception() {
         String email = "username@domain";
 
-        assertThrows(IllegalArgumentException.class, () -> connectionService.addConnection(initializer, email));
+        assertThrows(IllegalArgumentException.class, () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
     }
 
     @Test
@@ -124,7 +124,7 @@ class ConnectionServiceTest {
         String email = "tribbianijoey@friends.com";
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(receiver));
 
-        connectionService.addConnection(initializer, email);
+        connectionService.createConnectionBetweenTwoUsers(initializer, email);
 
         // Assert both initializer and receiver have a connection in which they appear as such
         assertThat(initializer.getInitializedConnections()
@@ -145,7 +145,7 @@ class ConnectionServiceTest {
 
         int initiatedConnectionsSizeBefore = initializer.getInitializedConnections().size();
 
-        connectionService.addConnection(initializer, email);
+        connectionService.createConnectionBetweenTwoUsers(initializer, email);
 
         assertThat(initializer.getInitializedConnections().size()).isEqualTo(initiatedConnectionsSizeBefore + 1);
     }
@@ -158,9 +158,10 @@ class ConnectionServiceTest {
 
         int receivedConnectionsSizeBefore = receiver.getReceivedConnections().size();
 
-        connectionService.addConnection(initializer, email);
+        connectionService.createConnectionBetweenTwoUsers(initializer, email);
 
         assertThat(receiver.getReceivedConnections().size()).isEqualTo(receivedConnectionsSizeBefore + 1);
+        verify(connectionRepository, times(1)).save(any(Connection.class));
     }
 
     @Test
@@ -169,7 +170,7 @@ class ConnectionServiceTest {
         String email = "tribbianijoey@friends.com";
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-        assertThrows(BuddyNotFoundException.class, () -> connectionService.addConnection(initializer, email));
+        assertThrows(BuddyNotFoundException.class, () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
     }
 
     @Test
@@ -182,7 +183,7 @@ class ConnectionServiceTest {
                      .findByInitializerOrReceiver(any(User.class), any(User.class)))
                 .thenReturn(List.of(existingConnection));
 
-        assertThrows(AlreadyABuddyException.class, () -> connectionService.addConnection(initializer, email));
+        assertThrows(AlreadyABuddyException.class, () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
     }
 
 }

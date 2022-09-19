@@ -31,7 +31,7 @@ public class ConnectionService {
     Clock          clock;
 
     public List<UserViewModel> getUserConnections(User user) {
-        Integer    userId      = user.getId();
+        Integer             userId      = user.getId();
         List<UserViewModel> connections = new ArrayList<>();
         // Get all connections where user is involved
         List<Connection> connectionsWhereUserIsInvolved = connectionRepository
@@ -52,7 +52,7 @@ public class ConnectionService {
     }
 
     @Transactional
-    public Connection addConnection(User initializer, String email) {
+    public Connection createConnectionBetweenTwoUsers(User initializer, String email) {
         if (UserService.isInvalidEmail(email)) {
             String invalidEmailMessage = "The email provided is invalid.";
             log.error(invalidEmailMessage);
@@ -72,7 +72,10 @@ public class ConnectionService {
             log.error(errorMessage);
             throw new AlreadyABuddyException(errorMessage);
         } else {
-            // Create connection with both users					;
+            // Create connection with both users
+            log.info("Creating new connection between " +
+                     initializer.getEmail() +
+                     " and " + receiver.getEmail() + ".");
             return saveConnection(createConnection(initializer, receiver));
         }
 
