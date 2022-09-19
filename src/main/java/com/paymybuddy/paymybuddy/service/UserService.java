@@ -73,7 +73,6 @@ public class UserService {
      * @return a set of users.
      */
     public List<UserViewModel> getUsers() {
-        // TODO revoir si on laisse le UserViewModel ou non
         Iterable<User>      users          = userRepository.findAll();
         List<UserViewModel> usersViewModel = new ArrayList<>();
         // extract info from user to user view model

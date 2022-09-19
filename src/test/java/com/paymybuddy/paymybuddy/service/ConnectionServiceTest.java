@@ -4,6 +4,7 @@ import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.ConnectionViewModel;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
@@ -23,8 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ConnectionServiceTest {
     // configure LocalDateTime.now() to 18th July 2022, 10:00:00
-    public final static LocalDateTime LOCAL_DATE_NOW = LocalDateTime.of(2022, 7, 18, 10, 0, 0);
+    private final static LocalDateTime LOCAL_DATE_NOW = LocalDateTime.of(2022, 7, 18, 10, 0, 0);
 
     /**
      * Class under test.
@@ -53,6 +53,8 @@ class ConnectionServiceTest {
     private User initializer;
     private User receiver;
 
+    private Connection connection;
+
 
     @BeforeAll
     public void initUsers() {
@@ -71,6 +73,8 @@ class ConnectionServiceTest {
         receiver.setPassword("HowUDoin");
         receiver.setEmail("tribbianijoey@friends.com");
         receiver.setBalance(new BigDecimal("0.00"));
+
+        connection = new Connection(1, initializer, receiver, LOCAL_DATE_NOW);
     }
 
     @BeforeEach
@@ -115,7 +119,8 @@ class ConnectionServiceTest {
     public void updateUser_usingValidEmail_shouldThrow_exception() {
         String email = "username@domain";
 
-        assertThrows(IllegalArgumentException.class, () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
+        assertThrows(IllegalArgumentException.class,
+                     () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
     }
 
     @Test
@@ -170,7 +175,8 @@ class ConnectionServiceTest {
         String email = "tribbianijoey@friends.com";
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-        assertThrows(BuddyNotFoundException.class, () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
+        assertThrows(BuddyNotFoundException.class,
+                     () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
     }
 
     @Test
@@ -183,7 +189,46 @@ class ConnectionServiceTest {
                      .findByInitializerOrReceiver(any(User.class), any(User.class)))
                 .thenReturn(List.of(existingConnection));
 
-        assertThrows(AlreadyABuddyException.class, () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
+        assertThrows(AlreadyABuddyException.class,
+                     () -> connectionService.createConnectionBetweenTwoUsers(initializer, email));
     }
 
+    @Test
+    @DisplayName("getConnections should return a list of ConnectionViewModels")
+    void getConnections_shouldReturn_listOfConnectionViewModels() {
+        when(connectionRepository.findAll()).thenReturn(List.of(connection));
+
+        List<ConnectionViewModel> result = connectionService.getConnections();
+
+        assertTrue(result.contains(ConnectionService.connectionToViewModel(connection)));
+    }
+
+    @Test
+    @DisplayName("getConnectionById should return a connection when exists")
+    void getConnectionById() {
+        when(connectionRepository.findById(connection.getId())).thenReturn(Optional.ofNullable(connection));
+        Optional<ConnectionViewModel> connectionViewModel = connectionService.getConnectionById(connection.getId());
+
+        assertEquals(connectionViewModel, Optional.of(ConnectionService.connectionToViewModel(connection)));
+    }
+
+    @Test
+    @DisplayName("getConnectionById should returnempty optional when connection does not exist")
+    void getConnectionById_empty() {
+        when(connectionRepository.findById(connection.getId())).thenReturn(Optional.empty());
+        Optional<ConnectionViewModel> connectionViewModel = connectionService.getConnectionById(connection.getId());
+
+        assertTrue(connectionViewModel.isEmpty());
+    }
+
+    @Test
+    @DisplayName("userToViewModel should return correct value")
+    void connectionToViewModel() {
+        ConnectionViewModel result = ConnectionService.connectionToViewModel(connection);
+
+        assertTrue(result.getStartingDate().isEqual(connection.getStartingDate()));
+        assertThat(result.getId()).isEqualTo(connection.getId());
+        assertEquals(result.getInitializer(), UserService.userToViewModel(connection.getInitializer()));
+        assertEquals(result.getReceiver(), UserService.userToViewModel(connection.getReceiver()));
+    }
 }
