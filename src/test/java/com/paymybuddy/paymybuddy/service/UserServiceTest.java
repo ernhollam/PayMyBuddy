@@ -46,6 +46,7 @@ class UserServiceTest {
     @BeforeEach
     public void initUsers() {
         testUser = new User();
+        testUser.setId(1);
         testUser.setFirstName("Chandler");
         testUser.setLastName("Bing");
         testUser.setPassword("CouldIBeAnyMoreBored");
@@ -53,10 +54,12 @@ class UserServiceTest {
         testUser.setBalance(new BigDecimal("2509.56"));
 
         otherUser = new User();
+        otherUser.setId(2);
         otherUser.setFirstName("Joey");
         otherUser.setLastName("Tribbiani");
         otherUser.setPassword("HowUDoin");
         otherUser.setEmail("otheremail@mail.com");
+        otherUser.setBalance(new BigDecimal("09.56"));
 
     }
 
@@ -159,15 +162,8 @@ class UserServiceTest {
 
         List<UserViewModel> result = userService.getUsers();
 
-        assertTrue(result.get(0).getEmail().equalsIgnoreCase(testUser.getEmail()));
-        assertTrue(result.get(0).getFirstname().equalsIgnoreCase(testUser.getFirstName()));
-        assertTrue(result.get(0).getLastname().equalsIgnoreCase(testUser.getLastName()));
-        assertThat(result.get(0).getBalance()).isEqualTo(testUser.getBalance());
-
-        assertTrue(result.get(1).getEmail().equalsIgnoreCase(otherUser.getEmail()));
-        assertTrue(result.get(1).getFirstname().equalsIgnoreCase(otherUser.getFirstName()));
-        assertTrue(result.get(1).getLastname().equalsIgnoreCase(otherUser.getLastName()));
-        assertThat(result.get(1).getBalance()).isEqualTo(otherUser.getBalance());
+        assertTrue(result.contains(UserService.userToViewModel(testUser)));
+        assertTrue(result.contains(UserService.userToViewModel(otherUser)));
     }
 
     @Test
