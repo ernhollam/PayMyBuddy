@@ -53,7 +53,7 @@ public class TransactionService {
             throw new InsufficientBalanceException(errorMessage);
         }
         // Check that buddy is making a transaction with a connection
-        if (!connectionService.getUserConnections(issuer).contains(payee)) {
+        if (!connectionService.getUserConnections(issuer).contains(UserService.userToViewModel(payee))) {
             String errorMessage = "The payee is not a buddy from issuer.";
             log.error(errorMessage);
             throw new InvalidPayeeException(errorMessage);

@@ -76,9 +76,7 @@ public class UserService {
         Iterable<User>      users          = userRepository.findAll();
         List<UserViewModel> usersViewModel = new ArrayList<>();
         // extract info from user to user view model
-        users.forEach(user -> usersViewModel.add(new UserViewModel(user.getEmail(), user.getFirstName(),
-                                                               user.getLastName(),
-                                                               user.getBalance())));
+        users.forEach(user -> usersViewModel.add(userToViewModel(user)));
         return usersViewModel;
     }
 
@@ -106,6 +104,18 @@ public class UserService {
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    /**
+     * Deletes a user.
+     *
+     * @param user
+     *         User to delete.
+     */
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+    }
+
+
 
 
     /**
@@ -142,5 +152,9 @@ public class UserService {
 
         user.setBalance(user.getBalance().subtract(new BigDecimal(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP)));
         userRepository.save(user);
+    }
+
+    public static UserViewModel userToViewModel(User user) {
+        return new UserViewModel(user.getEmail(), user.getFirstName(), user.getLastName(), user.getBalance());
     }
 }

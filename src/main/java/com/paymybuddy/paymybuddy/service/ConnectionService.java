@@ -4,6 +4,7 @@ import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +30,9 @@ public class ConnectionService {
     @Autowired
     Clock          clock;
 
-    public List<User> getUserConnections(User user) {
+    public List<UserViewModel> getUserConnections(User user) {
         Integer    userId      = user.getId();
-        List<User> connections = new ArrayList<>();
+        List<UserViewModel> connections = new ArrayList<>();
         // Get all connections where user is involved
         List<Connection> connectionsWhereUserIsInvolved = connectionRepository
                 .findByInitializerOrReceiver(user, user);
@@ -41,9 +42,9 @@ public class ConnectionService {
             User initializer = connection.getInitializer();
             User receiver    = connection.getReceiver();
             if (userId.equals(initializer.getId())) {
-                connections.add(receiver);
+                connections.add(UserService.userToViewModel(receiver));
             } else if (userId.equals(receiver.getId())) {
-                connections.add(initializer);
+                connections.add(UserService.userToViewModel(initializer));
             }
         }
         log.info("Connections for " + user.getEmail() + ":\n" + connections);
@@ -66,9 +67,8 @@ public class ConnectionService {
             throw new BuddyNotFoundException(errorMessage);
         }
         User receiver = optionalReceiver.get();
-        if (getUserConnections(initializer).contains(receiver)) {
-            String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
-                                  "of yours!.";
+        if (getUserConnections(initializer).contains(UserService.userToViewModel(receiver))) {
+            String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy!";
             log.error(errorMessage);
             throw new AlreadyABuddyException(errorMessage);
         } else {

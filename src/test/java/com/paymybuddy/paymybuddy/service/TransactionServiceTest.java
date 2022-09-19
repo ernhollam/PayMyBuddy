@@ -50,7 +50,6 @@ class TransactionServiceTest {
 
     private User   issuer;
     private User   payee;
-    private String description;
     private double amount;
 
     @BeforeAll
@@ -68,6 +67,7 @@ class TransactionServiceTest {
         payee.setPassword("HowUDoin");
         payee.setEmail("tribbianijoey@friends.com");
         payee.setBalance(new BigDecimal(0));
+
     }
 
     @BeforeEach
@@ -134,7 +134,7 @@ class TransactionServiceTest {
         BigDecimal totalAmount = new BigDecimal(Double.toString(amount + fee)).setScale(Fee.SCALE,
                                                                                         RoundingMode.HALF_UP);
         when(connectionService.getUserConnections(issuer))
-                .thenReturn(List.of(payee));
+                .thenReturn(List.of(UserService.userToViewModel(payee)));
 
         transactionService.createTransaction(issuer,
                                              payee,
@@ -150,7 +150,7 @@ class TransactionServiceTest {
         amount = 100;
         BigDecimal payeesBalanceBefore = payee.getBalance();
         when(connectionService.getUserConnections(issuer))
-                .thenReturn(List.of(payee));
+                .thenReturn(List.of(UserService.userToViewModel(payee)));
 
         transactionService.createTransaction(issuer,
                                              payee,
@@ -165,7 +165,7 @@ class TransactionServiceTest {
     @DisplayName("Transaction is registered in both issuer and payee's transaction list.")
     void createTransaction_shouldUpdate_issuerAndPayeesTransactionList() {
         when(connectionService.getUserConnections(issuer))
-                .thenReturn(List.of(payee));
+                .thenReturn(List.of(UserService.userToViewModel(payee)));
         amount = 100;
 
         transactionService.createTransaction(issuer,

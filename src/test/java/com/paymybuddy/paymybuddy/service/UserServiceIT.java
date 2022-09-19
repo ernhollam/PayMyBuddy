@@ -2,10 +2,7 @@ package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -24,22 +21,28 @@ public class UserServiceIT {
     @Autowired
     UserRepository userRepository;
 
-    private       User    user;
-    private final Integer id = 1;
+    private       User       user;
+    private       Integer    id;
+
+
+
     @BeforeEach
     void init() {
         user = new User();
-        user.setId(id);
         user.setEmail("testIT@mail.com");
         user.setFirstName("Firstname");
         user.setLastName("Lastname");
-        user.setBalance(new BigDecimal("150.60"));
         user.setPassword("tawfzeklf");
 
-        userService.createUser(user.getEmail(), user.getPassword());
+        user = userService.createUser(user.getEmail(), user.getPassword());
+        id = user.getId();
     }
 
-    //TODO vérifier qu'après un deposit et un withdraw le solde soit bien mis à jour
+    @AfterEach
+    void reset() {
+        userService.deleteUser(user);
+    }
+
     @Test
     @DisplayName("Deposit should add money to user's balance")
     void deposit() {
@@ -49,18 +52,19 @@ public class UserServiceIT {
 
         Optional<User> updatedUser = userService.getUserById(id);
         if (updatedUser.isEmpty()) fail("User was not found.");
-        assertThat(updatedUser.get().getBalance()).isEqualTo(new BigDecimal("200.60"));
+        assertThat(updatedUser.get().getBalance()).isEqualTo(new BigDecimal("50.00"));
     }
 
     @Test
     @DisplayName("Withdraw should subtract money to user's balance")
     void withdraw() {
+        //TODO demander pour le solde, on l'initialise à 0 et en faisant ce test, on le met à -50
         String amount = "50";
 
         userService.withdraw(user, amount);
 
         Optional<User> updatedUser = userService.getUserById(id);
         if (updatedUser.isEmpty()) fail("User was not found.");
-        assertThat(updatedUser.get().getBalance()).isEqualTo(new BigDecimal("100.60"));
+        assertThat(updatedUser.get().getBalance()).isEqualTo(new BigDecimal("-50.00"));
     }
 }

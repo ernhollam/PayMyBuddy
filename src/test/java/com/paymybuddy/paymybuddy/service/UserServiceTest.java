@@ -169,4 +169,15 @@ class UserServiceTest {
         assertTrue(result.get(1).getLastname().equalsIgnoreCase(otherUser.getLastName()));
         assertThat(result.get(1).getBalance()).isEqualTo(otherUser.getBalance());
     }
+
+    @Test
+    @DisplayName("userToViewModel should return correct value")
+    void userToViewModel() {
+        UserViewModel result = UserService.userToViewModel(testUser);
+
+        assertThat(result.getEmail()).isEqualTo(testUser.getEmail());
+        assertThat(result.getBalance()).isEqualTo(testUser.getBalance());
+        assertThat(result.getFirstname()).isEqualTo(testUser.getFirstName());
+        assertThat(result.getLastname()).isEqualTo(testUser.getLastName());
+    }
 }

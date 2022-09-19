@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -16,4 +17,21 @@ public class UserViewModel {
     private String     firstname;
     private String     lastname;
     private BigDecimal balance;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserViewModel userViewModel = (UserViewModel) o;
+        if (userViewModel.balance == null) userViewModel.balance = new BigDecimal("0.00"); // add check of null value
+        return (email.equalsIgnoreCase(userViewModel.email) &&
+                firstname.equalsIgnoreCase(userViewModel.firstname) &&
+                lastname.equalsIgnoreCase(userViewModel.lastname) &&
+                balance.equals(userViewModel.balance));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email, firstname, lastname, balance);
+    }
 }

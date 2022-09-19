@@ -4,6 +4,7 @@ import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -51,6 +53,7 @@ class ConnectionServiceTest {
     private User initializer;
     private User receiver;
 
+
     @BeforeAll
     public void initUsers() {
         initializer = new User();
@@ -59,6 +62,7 @@ class ConnectionServiceTest {
         initializer.setLastName("Bing");
         initializer.setPassword("CouldIBeAnyMoreBored");
         initializer.setEmail("bingchandler@friends.com");
+        initializer.setBalance(new BigDecimal("1250.48"));
 
         receiver = new User();
         receiver.setId(2);
@@ -66,6 +70,7 @@ class ConnectionServiceTest {
         receiver.setLastName("Tribbiani");
         receiver.setPassword("HowUDoin");
         receiver.setEmail("tribbianijoey@friends.com");
+        receiver.setBalance(new BigDecimal("0.00"));
     }
 
     @BeforeEach
@@ -98,12 +103,13 @@ class ConnectionServiceTest {
                 .thenReturn(List.of(connection1, connection2));
 
         // WHEN getting connections from testUser
-        List<User> userConnections = connectionService.getUserConnections(testUser);
+        List<UserViewModel> userConnections = connectionService.getUserConnections(testUser);
 
         // THEN testUser should have two connections, one they initiated and one they received
-        assertThat(userConnections.contains(receiver)).isTrue();
-        assertThat(userConnections.contains(initializer)).isTrue();
+        assertTrue(userConnections.contains(UserService.userToViewModel(receiver)));
+        assertTrue(userConnections.contains(UserService.userToViewModel(initializer)));
     }
+
     @Test
     @DisplayName("Adding user with invalid email should throw exception")
     public void updateUser_usingValidEmail_shouldThrow_exception() {
@@ -126,10 +132,11 @@ class ConnectionServiceTest {
                               .filter(connection -> connection.getInitializer().equals(initializer)
                                                     && connection.getReceiver().equals(receiver))).isNotNull();
         assertThat(receiver.getReceivedConnections()
-                              .stream()
-                              .filter(connection -> connection.getInitializer().equals(initializer)
-                                                    && connection.getReceiver().equals(receiver))).isNotNull();
+                           .stream()
+                           .filter(connection -> connection.getInitializer().equals(initializer)
+                                                 && connection.getReceiver().equals(receiver))).isNotNull();
     }
+
     @Test
     @DisplayName("Adding a connection should add a connection to initializer's list of initiated connections")
     void addConnection_shouldAdd_connectionToInitializedConnections() {
