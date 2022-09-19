@@ -4,6 +4,7 @@ import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.ConnectionViewModel;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
@@ -30,6 +31,14 @@ public class ConnectionService {
     @Autowired
     Clock          clock;
 
+    /**
+     * List all user's connection
+     *
+     * @param user
+     *         user for which the connections are wanted
+     *
+     * @return a list of user with their name, first name, last name and balance
+     */
     public List<UserViewModel> getUserConnections(User user) {
         Integer             userId      = user.getId();
         List<UserViewModel> connections = new ArrayList<>();
@@ -51,6 +60,16 @@ public class ConnectionService {
         return connections;
     }
 
+    /**
+     * Creates a connection between two users and saves it to database.
+     *
+     * @param initializer
+     *         connection initializer
+     * @param email
+     *         buddy to add
+     *
+     * @return connection object
+     */
     @Transactional
     public Connection createConnectionBetweenTwoUsers(User initializer, String email) {
         if (UserService.isInvalidEmail(email)) {
@@ -81,6 +100,16 @@ public class ConnectionService {
 
     }
 
+    /**
+     * Creates a connection object.
+     *
+     * @param initializer
+     *         connection initializer
+     * @param receiver
+     *         connection receiver
+     *
+     * @return connection object
+     */
     protected Connection createConnection(User initializer, User receiver) {
         Connection connection = new Connection();
         connection.setInitializer(initializer);
@@ -93,10 +122,51 @@ public class ConnectionService {
         return connection;
     }
 
+    /**
+     * Saves connection to database.
+     *
+     * @param connection
+     *         connection to save
+     *
+     * @return saved connection
+     */
     @Transactional
     public Connection saveConnection(Connection connection) {
         return connectionRepository.save(connection);
     }
 
+    /**
+     * Lists all connections in data base
+     *
+     * @return a list of connections
+     */
+    public List<ConnectionViewModel> getConnections() {
+        Iterable<Connection>      connections          = connectionRepository.findAll();
+        List<ConnectionViewModel> connectionViewModels = new ArrayList<>();
+        // extract info from user to user view model
+        connections.forEach(connection -> connectionViewModels.add(connectionToViewModel(connection)));
+        return connectionViewModels;
+    }
 
+    /**
+     * Gets a connection by its ID.
+     *
+     * @param id
+     *         connection to find
+     *
+     * @return Optional connection
+     */
+    public Optional<ConnectionViewModel> getConnectionById(Integer id) {
+        if (connectionRepository.findById(id).isPresent()) {
+            return Optional.of(connectionToViewModel(connectionRepository.findById(id).get()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static ConnectionViewModel connectionToViewModel(Connection connection) {
+        return new ConnectionViewModel(connection.getId(), UserService.userToViewModel(connection.getInitializer()),
+                                       UserService.userToViewModel(connection.getReceiver()),
+                                       connection.getStartingDate());
+    }
 }

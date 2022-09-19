@@ -55,7 +55,7 @@ public class UserService {
         Optional<User> existingUserWithEmail = userRepository.findByEmail(email);
         if (existingUserWithEmail.isPresent()) {
             String errorMessage = "Email " + email + " is already used." +
-                                  "Please sign in with another email.";
+                                  " Please sign in with another email.";
             log.error(errorMessage);
             throw new EmailAlreadyUsedException(errorMessage);
         }
@@ -73,7 +73,6 @@ public class UserService {
      * @return a set of users.
      */
     public List<UserViewModel> getUsers() {
-        // TODO revoir si on laisse le UserViewModel ou non
         Iterable<User>      users          = userRepository.findAll();
         List<UserViewModel> usersViewModel = new ArrayList<>();
         // extract info from user to user view model

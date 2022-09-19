@@ -70,28 +70,56 @@ public class UserController {
     }
 
 
+    /**
+     * Deposits money to user account.
+     * @param id id of user to deposit money to
+     * @param amount amount to deposit
+     */
     @PutMapping("/{id}/deposit")
     public void deposit(@PathVariable Integer id, @RequestParam String amount) {
         userService.deposit(getUser(id), amount);
     }
 
-
+    /**
+     * Withdraws money to user account.
+     * @param id id of user to withdraw money from
+     * @param amount amount to withdraw
+     */
     @PutMapping("/{id}/withdraw")
     public void withdraw(@PathVariable Integer id, @RequestParam String amount) {
         userService.withdraw(getUser(id), amount);
     }
 
+    /**
+     * Adds a connection to a user
+     * @param id user initiating the connection
+     * @param email email of buddy to add
+     * @return new connection object
+     */
     @PostMapping("/{id}/add-connection")
     @ResponseStatus(HttpStatus.CREATED)
     public Connection addConnection(@PathVariable Integer id, @RequestParam String email) {
         return connectionService.createConnectionBetweenTwoUsers(getUser(id), email);
     }
 
+    /**
+     * Get user connections.
+     * @param id user for which the connections are wanted
+     * @return a list of users
+     */
     @GetMapping("/{id}/connections")
     public List<UserViewModel> getConnections(@PathVariable Integer id) {
         return connectionService.getUserConnections(getUser(id));
     }
 
+    /**
+     * Creates a transaction involving the user and the buddy behind the specified email.
+     * @param id transaction initializer
+     * @param email transaction receiver email
+     * @param description short description for transaction
+     * @param amount amount of transaction
+     * @return a transaction object
+     */
     @PostMapping("/{id}/pay")
     @ResponseStatus(HttpStatus.CREATED)
     public Transaction payABuddy(@PathVariable Integer id,
@@ -111,6 +139,11 @@ public class UserController {
     }
 
 
+    /**
+     * Useful function to get a User object thanks to an ID
+     * @param id id of user to return
+     * @return a User object
+     */
     protected User getUser(Integer id) {
         Optional<User> user = userService.getUserById(id);
         if (user.isEmpty()) {
