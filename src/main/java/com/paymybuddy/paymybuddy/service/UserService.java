@@ -79,7 +79,6 @@ public class UserService {
         users.forEach(user -> usersViewModel.add(new UserViewModel(user.getEmail(), user.getFirstName(),
                                                                user.getLastName(),
                                                                user.getBalance())));
-
         return usersViewModel;
     }
 
