@@ -1,9 +1,9 @@
 package com.paymybuddy.paymybuddy.controller;
 
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
-import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.model.viewmodel.ConnectionViewModel;
+import com.paymybuddy.paymybuddy.model.viewmodel.TransactionViewModel;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.service.ConnectionService;
 import com.paymybuddy.paymybuddy.service.TransactionService;
@@ -65,8 +65,10 @@ public class UserController {
      * @return optional user
      */
     @GetMapping("/{id}")
-    public Optional<User> getUserById(@PathVariable(name = "id") Integer id) {
-        return userService.getUserById(id);
+    public Optional<UserViewModel> getUserById(@PathVariable(name = "id") Integer id) {
+        Optional<User> userById = userService.getUserById(id);
+        if (userById.isEmpty())  return Optional.empty();
+        return Optional.of(UserService.userToViewModel(userById.get()));
     }
 
 
@@ -99,8 +101,6 @@ public class UserController {
     /**
      * Adds a connection to a user
      *
-     * @param id
-     *         user initiating the connection
      * @param email
      *         email of buddy to add
      *
@@ -108,8 +108,8 @@ public class UserController {
      */
     @PostMapping("/add-connection")
     @ResponseStatus(HttpStatus.CREATED)
-    public ConnectionViewModel addConnection(@PathVariable Integer id, @RequestParam String email) {
-        return ConnectionService.connectionToViewModel(connectionService.createConnectionBetweenTwoUsers(getUser(id),
+    public ConnectionViewModel addConnection(@RequestParam String email) {
+        return ConnectionService.connectionToViewModel(connectionService.createConnectionBetweenTwoUsers(userService.getCurrentUser(),
                                                                                                          email));
     }
 
@@ -119,7 +119,7 @@ public class UserController {
      * @param id
      *         user for which the connections are wanted
      *
-     * @return a list of users
+     * @return a list of connections
      */
     @GetMapping("/{id}/connections")
     public List<UserViewModel> getConnections(@PathVariable Integer id) {
@@ -140,7 +140,7 @@ public class UserController {
      */
     @PostMapping("/pay")
     @ResponseStatus(HttpStatus.CREATED)
-    public Transaction payABuddy(@RequestParam String email,
+    public TransactionViewModel payABuddy(@RequestParam String email,
                                  @RequestParam String description,
                                  @RequestParam double amount) {
         if (userService.getUserByEmail(email).isEmpty()) {
@@ -149,10 +149,23 @@ public class UserController {
             log.error(errorMessage);
             throw new BuddyNotFoundException(errorMessage);
         }
-        return transactionService.createTransaction(userService.getCurrentUser(),
+        return TransactionService.transactionToViewModel(transactionService.createTransaction(userService.getCurrentUser(),
                                                     userService.getUserByEmail(email).get(),
                                                     description,
-                                                    amount);
+                                                    amount));
+    }
+
+    /**
+     * Get user connections.
+     *
+     * @param id
+     *         user for which the transactions are wanted
+     *
+     * @return a list of transactions
+     */
+    @GetMapping("/{id}/transactions")
+    public List<TransactionViewModel> getTransactions(@PathVariable Integer id) {
+        return transactionService.getUserTransactions(id);
     }
 
 

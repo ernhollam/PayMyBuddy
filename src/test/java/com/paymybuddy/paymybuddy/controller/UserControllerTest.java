@@ -3,6 +3,7 @@ package com.paymybuddy.paymybuddy.controller;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
+import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import com.paymybuddy.paymybuddy.service.ConnectionService;
 import com.paymybuddy.paymybuddy.service.TransactionService;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +45,8 @@ class UserControllerTest {
     private ConnectionRepository connectionRepository;
     @MockBean
     private TransactionService   transactionService;
+    @MockBean
+    TransactionRepository transactionRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -153,6 +157,16 @@ class UserControllerTest {
         when(userService.getUserById(id))
                 .thenReturn(Optional.ofNullable(testUser));
         mockMvc.perform(get("/user/" + id + "/connections"))
+               .andDo(print())
+               .andExpect(status().isOk());
+    }
+    @Test
+    void getTransactions() throws Exception {
+        when(userService.getUserById(id))
+                .thenReturn(Optional.ofNullable(testUser));
+        when(transactionRepository
+                     .findByIssuerOrPayee(testUser, testUser)).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/user/" + id + "/transactions"))
                .andDo(print())
                .andExpect(status().isOk());
     }
