@@ -222,7 +222,7 @@ class ConnectionServiceTest {
     }
 
     @Test
-    @DisplayName("userToViewModel should return correct value")
+    @DisplayName("connectionToViewModel should return correct value")
     void connectionToViewModel() {
         ConnectionViewModel result = ConnectionService.connectionToViewModel(connection);
 

@@ -1,11 +1,13 @@
 package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.constants.Fee;
+import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.InsufficientBalanceException;
 import com.paymybuddy.paymybuddy.exceptions.InvalidAmountException;
 import com.paymybuddy.paymybuddy.exceptions.InvalidPayeeException;
 import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.TransactionViewModel;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,8 @@ public class TransactionService {
     @Autowired
     ConnectionService     connectionService;
     @Autowired
+    UserService           userService;
+    @Autowired
     Clock                 clock;
 
     /**
@@ -36,11 +41,13 @@ public class TransactionService {
     public Transaction createTransaction(User issuer, User payee, String description, double amount) {
         // Check that amount is not negative nor 0
         if (amount < 0) {
-            String errorMessage = "Transaction amount can not be negative."; log.error(errorMessage);
+            String errorMessage = "Transaction amount can not be negative.";
+            log.error(errorMessage);
             throw new InvalidAmountException(errorMessage);
         }
         if (amount == 0) {
-            String errorMessage = "Transaction amount must be more than 0."; log.error(errorMessage);
+            String errorMessage = "Transaction amount must be more than 0.";
+            log.error(errorMessage);
             throw new InvalidAmountException(errorMessage);
         }
         // Calculate fee and total amount
@@ -49,7 +56,8 @@ public class TransactionService {
                 .setScale(Fee.SCALE, RoundingMode.HALF_UP);
         // Check that issuer has enough money for this transaction
         if (issuer.getBalance().compareTo(amountWithFee) < 0) {
-            String errorMessage = "Issuer has insufficient balance to make this transfer."; log.error(errorMessage);
+            String errorMessage = "Issuer has insufficient balance to make this transfer.";
+            log.error(errorMessage);
             throw new InsufficientBalanceException(errorMessage);
         }
         // Check that buddy is making a transaction with a connection
@@ -81,16 +89,6 @@ public class TransactionService {
     }
 
     /**
-     * List all transactions.
-     *
-     * @return a list of all transactions where the user is involved.
-     */
-
-    public List<Transaction> getUserTransactions(User user) {
-        return transactionRepository.findByIssuerOrPayee(user, user);
-    }
-
-    /**
      * Gets a transaction by ID.
      *
      * @return a transaction
@@ -98,6 +96,37 @@ public class TransactionService {
 
     public Optional<Transaction> getTransactionById(Integer id) {
         return transactionRepository.findById(id);
+    }
+
+    /**
+     * List all user's transactions.
+     *
+     * @param id
+     *         user ID for which the transactions are wanted
+     *
+     * @return a list of transactions
+     */
+    public List<TransactionViewModel> getUserTransactions(Integer id) {
+        if (userService.getUserById(id).isEmpty()) {
+            log.error("User does not exist.");
+            throw new BuddyNotFoundException("User does not exist.");
+        }
+        User                       user         = userService.getUserById(id).get();
+        List<TransactionViewModel> transactions = new ArrayList<>();
+        // Get all transactions where user is involved
+        List<Transaction> transactionsWhereUserIsInvolved = transactionRepository
+                .findByIssuerOrPayee(user, user);
+        log.debug("Found transactions involving " + user.getEmail() + ":\n" + transactionsWhereUserIsInvolved);
+        transactionsWhereUserIsInvolved.forEach(transaction ->  transactions.add(transactionToViewModel(transaction)));
+        log.info("Transactions with " + user.getEmail() + ":\n" + transactions);
+        return transactions;
+    }
+
+    public static TransactionViewModel transactionToViewModel(Transaction transaction) {
+        return new TransactionViewModel(transaction.getId(),
+                                        UserService.userToViewModel(transaction.getIssuer()),
+                                        UserService.userToViewModel(transaction.getPayee()),
+                                        transaction.getDate(), transaction.getAmount(), transaction.getDescription());
     }
 
 }

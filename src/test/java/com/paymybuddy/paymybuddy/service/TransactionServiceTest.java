@@ -4,7 +4,9 @@ import com.paymybuddy.paymybuddy.constants.Fee;
 import com.paymybuddy.paymybuddy.exceptions.InsufficientBalanceException;
 import com.paymybuddy.paymybuddy.exceptions.InvalidAmountException;
 import com.paymybuddy.paymybuddy.exceptions.InvalidPayeeException;
+import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.TransactionViewModel;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +22,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +44,8 @@ class TransactionServiceTest {
 
     @MockBean
     ConnectionService connectionService;
+    @MockBean
+    UserService       userService;
 
     @MockBean
     Clock clock;
@@ -48,9 +53,10 @@ class TransactionServiceTest {
     // configure LocalDateTime.now() to 18th July 2022, 10:00:00
     private final static LocalDateTime LOCAL_DATE_NOW = LocalDateTime.of(2022, 7, 18, 10, 0, 0);
 
-    private User   issuer;
-    private User   payee;
-    private double amount;
+    private User        issuer;
+    private User        payee;
+    private double      amount;
+    private Transaction transaction;
 
     @BeforeAll
     void initUsers() {
@@ -69,6 +75,8 @@ class TransactionServiceTest {
         payee.setPassword("HowUDoin");
         payee.setEmail("tribbianijoey@friends.com");
         payee.setBalance(new BigDecimal(0));
+
+        transaction = new Transaction(1, issuer, payee, LOCAL_DATE_NOW, new BigDecimal("20"), "transaction test.");
 
     }
 
@@ -180,4 +188,26 @@ class TransactionServiceTest {
         assertThat(payee.getReceivedTransactions()).isNotNull();
     }
 
+    @Test
+    @DisplayName("getUserTransactions should return a connection")
+    void getUserTransactions() {
+        when(transactionRepository.findByIssuerOrPayee(issuer, issuer)).thenReturn(List.of(transaction));
+        when(userService.getUserById(issuer.getId())).thenReturn(Optional.of(issuer));
+        List<TransactionViewModel> result = transactionService.getUserTransactions(issuer.getId());
+
+        assertTrue(result.contains(TransactionService.transactionToViewModel(transaction)));
+    }
+
+    @Test
+    @DisplayName("transactionToViewModel should return correct value")
+    void transactionToViewModel() {
+        TransactionViewModel result = TransactionService.transactionToViewModel(transaction);
+
+        assertEquals(result.getId(), transaction.getId());
+        assertEquals(result.getIssuer(), UserService.userToViewModel(transaction.getIssuer()));
+        assertEquals(result.getPayee(), UserService.userToViewModel(transaction.getPayee()));
+        assertEquals(result.getDate(), transaction.getDate());
+        assertEquals(result.getAmount(), transaction.getAmount());
+        assertTrue(result.getDescription().equalsIgnoreCase(transaction.getDescription()));
+    }
 }
