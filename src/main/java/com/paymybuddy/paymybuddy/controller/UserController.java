@@ -1,9 +1,9 @@
 package com.paymybuddy.paymybuddy.controller;
 
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
-import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.ConnectionViewModel;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.service.ConnectionService;
 import com.paymybuddy.paymybuddy.service.TransactionService;
@@ -72,8 +72,11 @@ public class UserController {
 
     /**
      * Deposits money to user account.
-     * @param id id of user to deposit money to
-     * @param amount amount to deposit
+     *
+     * @param id
+     *         id of user to deposit money to
+     * @param amount
+     *         amount to deposit
      */
     @PutMapping("/{id}/deposit")
     public void deposit(@PathVariable Integer id, @RequestParam String amount) {
@@ -82,8 +85,11 @@ public class UserController {
 
     /**
      * Withdraws money to user account.
-     * @param id id of user to withdraw money from
-     * @param amount amount to withdraw
+     *
+     * @param id
+     *         id of user to withdraw money from
+     * @param amount
+     *         amount to withdraw
      */
     @PutMapping("/{id}/withdraw")
     public void withdraw(@PathVariable Integer id, @RequestParam String amount) {
@@ -92,19 +98,27 @@ public class UserController {
 
     /**
      * Adds a connection to a user
-     * @param id user initiating the connection
-     * @param email email of buddy to add
+     *
+     * @param id
+     *         user initiating the connection
+     * @param email
+     *         email of buddy to add
+     *
      * @return new connection object
      */
-    @PostMapping("/{id}/add-connection")
+    @PostMapping("/add-connection")
     @ResponseStatus(HttpStatus.CREATED)
-    public Connection addConnection(@PathVariable Integer id, @RequestParam String email) {
-        return connectionService.createConnectionBetweenTwoUsers(getUser(id), email);
+    public ConnectionViewModel addConnection(@PathVariable Integer id, @RequestParam String email) {
+        return ConnectionService.connectionToViewModel(connectionService.createConnectionBetweenTwoUsers(getUser(id),
+                                                                                                         email));
     }
 
     /**
      * Get user connections.
-     * @param id user for which the connections are wanted
+     *
+     * @param id
+     *         user for which the connections are wanted
+     *
      * @return a list of users
      */
     @GetMapping("/{id}/connections")
@@ -114,16 +128,19 @@ public class UserController {
 
     /**
      * Creates a transaction involving the user and the buddy behind the specified email.
-     * @param id transaction initializer
-     * @param email transaction receiver email
-     * @param description short description for transaction
-     * @param amount amount of transaction
+     *
+     * @param email
+     *         transaction receiver email
+     * @param description
+     *         short description for transaction
+     * @param amount
+     *         amount of transaction
+     *
      * @return a transaction object
      */
-    @PostMapping("/{id}/pay")
+    @PostMapping("/pay")
     @ResponseStatus(HttpStatus.CREATED)
-    public Transaction payABuddy(@PathVariable Integer id,
-                                 @RequestParam String email,
+    public Transaction payABuddy(@RequestParam String email,
                                  @RequestParam String description,
                                  @RequestParam double amount) {
         if (userService.getUserByEmail(email).isEmpty()) {
@@ -132,7 +149,7 @@ public class UserController {
             log.error(errorMessage);
             throw new BuddyNotFoundException(errorMessage);
         }
-        return transactionService.createTransaction(getUser(id),
+        return transactionService.createTransaction(userService.getCurrentUser(),
                                                     userService.getUserByEmail(email).get(),
                                                     description,
                                                     amount);
@@ -141,7 +158,10 @@ public class UserController {
 
     /**
      * Useful function to get a User object thanks to an ID
-     * @param id id of user to return
+     *
+     * @param id
+     *         id of user to return
+     *
      * @return a User object
      */
     protected User getUser(Integer id) {

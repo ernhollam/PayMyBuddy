@@ -62,6 +62,8 @@ public class UserService {
         User user = new User();
         user.setEmail(email);
         user.setPassword(password);
+        if (user.getFirstName() == null) user.setFirstName("");
+        if (user.getLastName() == null) user.setLastName("");
         user.setBalance(new BigDecimal("0.00"));
         return userRepository.save(user);
     }
@@ -155,5 +157,10 @@ public class UserService {
     public static UserViewModel userToViewModel(User user) {
         return new UserViewModel(user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(),
                                  user.getBalance());
+    }
+
+    public User getCurrentUser() {
+        /*Authentication authentication = SecurityContextHolder.getContext().getAuthentication();*/
+        return getUserById(4).get();
     }
 }
