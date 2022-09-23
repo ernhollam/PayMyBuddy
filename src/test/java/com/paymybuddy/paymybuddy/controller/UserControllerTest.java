@@ -1,6 +1,8 @@
 package com.paymybuddy.paymybuddy.controller;
 
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
+import com.paymybuddy.paymybuddy.model.Connection;
+import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
@@ -8,8 +10,10 @@ import com.paymybuddy.paymybuddy.repository.UserRepository;
 import com.paymybuddy.paymybuddy.service.ConnectionService;
 import com.paymybuddy.paymybuddy.service.TransactionService;
 import com.paymybuddy.paymybuddy.service.UserService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,7 +30,7 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserControllerTest {
     @MockBean
     private UserService          userService;
@@ -59,6 +64,31 @@ class UserControllerTest {
     public final static LocalDateTime LOCAL_DATE_NOW = LocalDateTime.of(2022, 7, 18, 10, 0, 0);
     @MockBean
     Clock clock;
+    private Connection  connection;
+    private Transaction transaction;
+
+    @BeforeAll
+    public void initATransactionAndConnection() {
+        User initializer = new User();
+        initializer.setId(1);
+        initializer.setFirstName("Chandler");
+        initializer.setLastName("Bing");
+        initializer.setPassword("CouldIBeAnyMoreBored");
+        initializer.setEmail("bingchandler@friends.com");
+        initializer.setBalance(new BigDecimal("1250.48"));
+
+        User receiver = new User();
+        receiver.setId(2);
+        receiver.setFirstName("Joey");
+        receiver.setLastName("Tribbiani");
+        receiver.setPassword("HowUDoin");
+        receiver.setEmail("tribbianijoey@friends.com");
+        receiver.setBalance(new BigDecimal("0.00"));
+
+        connection = new Connection(1, initializer, receiver, LOCAL_DATE_NOW);
+        transaction = new Transaction(1, initializer, receiver, LOCAL_DATE_NOW, new BigDecimal("12.69"),
+                                      "UserController Test");
+    }
 
     @BeforeEach
     public void initUsers() {
@@ -143,10 +173,10 @@ class UserControllerTest {
 
     @Test
     void addConnection() throws Exception {
-        when(userService.getUserById(id)).thenReturn(Optional.of(testUser));
+        when(userService.getCurrentUser()).thenReturn(testUser);
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser));
-
-        mockMvc.perform(post("/user/" + id + "/add-connection")
+        when(connectionService.createConnectionBetweenTwoUsers(testUser, otherUser.getEmail())).thenReturn(connection);
+        mockMvc.perform(post("/user/add-connection")
                                 .param("email", otherUser.getEmail()))
                .andDo(print())
                .andExpect(status().isCreated());
@@ -160,6 +190,7 @@ class UserControllerTest {
                .andDo(print())
                .andExpect(status().isOk());
     }
+
     @Test
     void getTransactions() throws Exception {
         when(userService.getUserById(id))
@@ -173,11 +204,13 @@ class UserControllerTest {
 
     @Test
     void payABuddy() throws Exception {
-        when(userService.getUserById(id)).thenReturn(Optional.of(testUser));
+        when(userService.getCurrentUser()).thenReturn(testUser);
         when(userService.getUserByEmail(otherUser.getEmail())).thenReturn(Optional.of(otherUser));
-        when(connectionService.getUserConnections(testUser)).thenReturn(List.of(UserService.userToViewModel(otherUser)));
-
-        mockMvc.perform(post("/user/" + id + "/pay")
+        when(connectionService.getUserConnections(testUser))
+                .thenReturn(List.of(UserService.userToViewModel(otherUser)));
+        when(transactionService.createTransaction(any(User.class), any(User.class), anyString(), anyDouble()))
+                .thenReturn(transaction);
+        mockMvc.perform(post("/user/pay")
                                 .param("email", otherUser.getEmail())
                                 .param("description", "Pay a buddy test")
                                 .param("amount", "8.93"))
@@ -187,11 +220,11 @@ class UserControllerTest {
 
     @Test
     void payABuddy_shouldThrow_exception() throws Exception {
-        when(userService.getUserById(id)).thenReturn(Optional.of(testUser));
+        when(userService.getCurrentUser()).thenReturn(testUser);
         when(userService.getUserByEmail(otherUser.getEmail())).thenReturn(Optional.empty());
         when(connectionService.getUserConnections(testUser)).thenReturn(List.of(UserService.userToViewModel(otherUser)));
 
-        mockMvc.perform(post("/user/" + id + "/pay")
+        mockMvc.perform(post("/user/pay")
                                 .param("email", otherUser.getEmail())
                                 .param("description", "Pay a buddy test")
                                 .param("amount", "8.93"))

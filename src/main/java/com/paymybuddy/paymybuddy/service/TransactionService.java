@@ -88,14 +88,26 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    /**
-     * Gets a transaction by ID.
-     *
-     * @return a transaction
-     */
 
-    public Optional<Transaction> getTransactionById(Integer id) {
-        return transactionRepository.findById(id);
+    /**
+     * Lists all connections in data base
+     *
+     * @return a list of connections
+     */
+    public List<TransactionViewModel> getTransactions() {
+        Iterable<Transaction>      transactions          = transactionRepository.findAll();
+        List<TransactionViewModel> transactionViewModels = new ArrayList<>();
+        // extract info from user to user view model
+        transactions.forEach(transaction -> transactionViewModels.add(transactionToViewModel(transaction)));
+        return transactionViewModels;
+    }
+
+    public Optional<TransactionViewModel> getTransactionById(Integer id) {
+        if (transactionRepository.findById(id).isPresent()) {
+            return Optional.of(transactionToViewModel(transactionRepository.findById(id).get()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
