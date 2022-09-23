@@ -124,8 +124,8 @@ class UserControllerTest {
 
     @Test
     void deposit() throws Exception {
-        when(userService.getUserById(id)).thenReturn(Optional.of(testUser));
-        mockMvc.perform(put("/user/" + id + "/deposit")
+        when(userService.getCurrentUser()).thenReturn(testUser);
+        mockMvc.perform(put("/user/deposit")
                                 .param("amount", "50.00"))
                .andDo(print())
                .andExpect(status().isOk());
@@ -133,8 +133,8 @@ class UserControllerTest {
 
     @Test
     void withdraw() throws Exception {
-        when(userService.getUserById(id)).thenReturn(Optional.of(testUser));
-        mockMvc.perform(put("/user/" + id + "/withdraw")
+        when(userService.getCurrentUser()).thenReturn(testUser);
+        mockMvc.perform(put("/user/withdraw")
                                 .param("amount", "50.00"))
                .andDo(print())
                .andExpect(status().isOk());

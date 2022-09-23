@@ -75,27 +75,25 @@ public class UserController {
     /**
      * Deposits money to user account.
      *
-     * @param id
-     *         id of user to deposit money to
      * @param amount
      *         amount to deposit
      */
-    @PutMapping("/{id}/deposit")
-    public void deposit(@PathVariable Integer id, @RequestParam String amount) {
-        userService.deposit(getUser(id), amount);
+    @PutMapping("/deposit")
+    public UserViewModel deposit(@RequestParam String amount) {
+        userService.deposit(userService.getCurrentUser(), amount);
+        return UserService.userToViewModel(userService.getCurrentUser());
     }
 
     /**
      * Withdraws money to user account.
      *
-     * @param id
-     *         id of user to withdraw money from
      * @param amount
      *         amount to withdraw
      */
-    @PutMapping("/{id}/withdraw")
-    public void withdraw(@PathVariable Integer id, @RequestParam String amount) {
-        userService.withdraw(getUser(id), amount);
+    @PutMapping("/withdraw")
+    public UserViewModel withdraw(@RequestParam String amount) {
+        userService.withdraw(userService.getCurrentUser(), amount);
+        return UserService.userToViewModel(userService.getCurrentUser());
     }
 
     /**
