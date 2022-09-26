@@ -36,7 +36,7 @@ class TransactionRepositoryIT {
     private User        issuer;
 
     // configure LocalDateTime.now() to 18th July 2022, 10:00:00
-    public final static LocalDateTime LOCAL_DATE_NOW = LocalDateTime.of(2022, 7, 18, 10, 0, 0);
+    private final static LocalDateTime LOCAL_DATE_NOW = LocalDateTime.of(2022, 7, 18, 10, 0, 0);
     @MockBean
     Clock clock;
 
