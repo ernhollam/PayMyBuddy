@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link th:fragment="head-stylesheet"
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" th:fragment="header">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="@{/home}">Pay My Buddy</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li th:classappend="${module == 'home' ? 'active' : ''}">
+                    <a href="#" th:href="@{/}">Home</a>
+                </li>
+                <li th:classappend="${module == 'transfer' ? 'active' : ''}">
+                    <a href="#" th:href="@{/transfer}">Transfer</a>
+                </li>
+                <li th:classappend="${module == 'profile' ? 'active' : ''}">
+                    <a href="#" th:href="@{/profile}">Profile</a>
+                </li>
+                <li th:classappend="${module == 'contact' ? 'active' : ''}">
+                    <a href="#" th:href="@{/contact}">Contact</a>
+                </li>
+                <li >
+                    <a href="#" th:href="@{/logoff}">Logoff</a>
+                </li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+</body>
+</html>
