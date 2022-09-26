@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/login.css}" rel="stylesheet" />
+</head>
+
+<body>
+<main id="main-container">
+  <form id="login">
+      <div>
+          <button type="submit" name="home">Pay My Buddy</button>
+      </div>
+      <div id="email">
+          <input type="text" placeholder="Email" />
+      </div>
+      <div>
+          <input type="text" placeholder="Password"/>
+      </div>
+      <div>
+          <label>Remember me</label>
+          <input type="checkbox" th:field="*{rememberMe}" />
+      </div>
+      <div>
+          <button type="submit" name="login">Login</button>
+      </div>
+  </form>
+</main>
+</body>
+
+</html>
