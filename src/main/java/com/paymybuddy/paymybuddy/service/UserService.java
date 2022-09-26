@@ -113,6 +113,7 @@ public class UserService {
      * @param user
      *         User to delete.
      */
+    @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);
     }
@@ -135,6 +136,7 @@ public class UserService {
     /**
      * Deposits money to buddy account.
      */
+    @Transactional
     public void deposit(User user, String amount) {
         // if amount is still not valid after interface's validator, remove any negative signs
         amount = amount.replace("-", "");
@@ -146,6 +148,7 @@ public class UserService {
     /**
      * Withdraws money to user's bank account.
      */
+    @Transactional
     public void withdraw(User user, String amount) {
         // if amount is still not valid after interface's validator, remove any negative signs
         amount = amount.replace("-", "");
