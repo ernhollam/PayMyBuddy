@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Pay My Buddy - Transfer</title>
@@ -13,58 +11,129 @@
 </head>
 
 <body>
-<div th:insert="fragments/header::header-nav"></div>
-<div id="content">
-    <section id="send-money" class="container">
-        <div id="send-money-title">
-            <h4 class="col">Send money</h4>
-            <button type="button" class="col btn btn-primary btn-right">Add connection</button>
+
+<div id="transfer-header">
+    <!--navigation bar-->
+    <nav class="navbar navbar-expand-lg navbar-light justify-content-end">
+        <button class="btn btn-success mr-auto ml-2">Pay My Buddy</button>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
+            <ul class="navbar-nav text-right">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link text-primary" href="/transfer">Transfer<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logoff">Logoff</a>
+                </li>
+            </ul>
         </div>
-        <form id="send-money-form" th:action="@{/pay}" method="POST">
-            <div id="send-money-list-connections" class="col input-group">
-                <select th:field="*{connections}">
-                    <option th:each="connection : ${userConnections}"
-                            th:value="${connection.getEmail()}"
-                            th:text="#{${'connection.getFirstname()' + ' ' + 'connection.getLastname'}}">Connection
-                    </option>
-                </select>
-            </div>
-            <div id="send-money-amount">
-                <input type="number" min="0.01"
-                       step="0.01" value="0" placeholder="Amount"
-                       id="amount" name="amount" required>
-            </div>
-            <div id="send-money-pay">
-                <button type="button" class="btn btn-primary">Pay</button>
-            </div>
-        </form>
-        <div></div>
-    </section>
-
-    <section id="my-transactions">
-        <div class="transactions" th:unless="${#lists.isEmpty(allSeedStarters)}">
-
-            <h4 th:text="#{title.list}">My transactions</h4>
-
-            <table id="user-transactions">
-                <thead>
-                <tr>
-                    <th>Connections</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="transaction : ${userTransactions}">
-                    <td th:text="((${transaction.issuer} != ${authenticatedUser}) ? transaction.issuer : transaction.receiver)"></td>
-                    <td th:text="#{transaction.description}"></td>
-                    <td th:text="#{transaction.amount}"></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+    </nav>
+    <!--breadcrumb-->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Transfer</li>
+        </ol>
+    </nav>
 </div>
 
+<div class="container">
+    <div class="container" id="transfer-content">
+        <div class="container" id="send-money">
+            <!--send money-->
+            <!--label and add connection button-->
+            <div class="row d-flex justify-content-between" id="send-money-header">
+                <div class="col-md-6 mb-4">
+                    <h4>Send money</h4>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <button type="button" class="col btn btn-primary">Add connection</button>
+                </div>
+            </div>
+            <!--select connection, amount and Pay button-->
+            <div class="row d-flex justify-content-center md-6 bg-light justify-content-center align-items-center" id="send-money-body">
+                <div id="send-money-list-connections" class="col input-group">
+                    <select>
+                        <option th:each="connection : ${connections}"
+                                th:value="${connection.getEmail()}"
+                                th:text="#{${'connection.getFirstname()' + ' ' + 'connection.getLastname'}}">Select a connection
+                        </option>
+                    </select>
+                </div>
+                <div id="send-money-amount" class="col input-group">
+                    <input type="number" min="0.01"
+                           step="0.01" value="0" placeholder="Amount"
+                           id="amount" name="amount" required>
+                </div>
+                <div id="send-money-pay" class="col input-group">
+                    <button type="button" class="btn btn-success">Pay</button>
+                </div>
+            </div>
+        </div>
+
+        <!--my transactions-->
+        <div class="container" id="my-transactions">
+            <div class="col">
+                <div class="row">
+                    <h4>My transactions</h4>
+                </div>
+                <div class="row">
+                    <table id="user-transactions" class="table table-striped">
+                        <thead class="bg-success">
+                        <tr>
+                            <th scope="col">Connections</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Amount</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="transaction : ${transactions}">
+                            <td th:text="((${transaction.issuer} != ${user}) ? transaction.issuer : transaction.receiver)">Haley</td>
+                            <td th:text="#{transaction.description}">Restaurant bill share</td>
+                            <td th:text="#{transaction.amount}">10.00 €</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="container">
+        <div th:replace="fragments/footer :: footer">Pay My Buddy | 2022 | &copy; <a href="https://github.com/ernhollam/PayMyBuddy" target="_blank">ernhollam</a></div>
+    </footer>
+</div>
 </body>
 </html>
