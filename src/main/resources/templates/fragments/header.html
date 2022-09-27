@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+</head>
+
+<body>
+<div th:fragment="header-nav"
+     th:with="uri=${#httpServletRequest.getRequestURI()}"
+     class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="@{/home}">Pay My Buddy</a>
+        </div>
+        <div class="navbar-collapse collapse" id="navbarNav">
+            <ul class="navbar-nav nav navbar-right">
+                <li th:classappend="${uri == '/home' ? 'active':''}"
+                   class="nav-item nav-link" th:href="@{/home}">Home
+                </li>
+                <li th:classappend="${uri == '/transfer' ? 'active':''}"
+                   class="nav-item nav-link" th:href="@{/transfer}">Transfer
+                </li>
+                <li th:classappend="${uri == '/profile' ? 'active':''}"
+                   class="nav-item nav-link" th:href="@{/profile}">Profile
+                </li>
+                <li th:classappend="${uri == '/contact' ? 'active':''}"
+                   class="nav-item nav-link" th:href="@{/contact}">Contact
+                </li>
+                <li class="nav-item nav-link" href="/logoff">Log off</li>
+            </ul>
+        </div>
+    </div>
+    <div th:fragment="header-breadcrumb" aria-label="breadcrumb" style="background-color: #f5f5f5;">
+        <ol class="breadcrumb container" th:replace="${breadcrumb}">
+            <li class="breadcrumb-item" th:unless="${uri == '/home'}"><a th:href="@{/home}">Home</a></li>
+            <li class="breadcrumb-item active" th:if="${uri == '/home'}">Home</li>
+            <li class="breadcrumb-item active" th:if="${uri == '/profile'}">Profile</li>
+            <li class="breadcrumb-item active" th:if="${uri == '/contact'}">Contact</li>
+            <li class="breadcrumb-item active" th:if="${uri == '/transfer'}">Transfer</li>
+            <li class="breadcrumb-item" th:if="${uri.startsWith('/pay') || uri.startsWith('/add-connection')}"><a th:href="@{/transfer}">Transfer</a></li>
+            <li class="breadcrumb-item active" th:if="${uri.startsWith('/add-connection')}">Add connection</li>
+            <li class="breadcrumb-item active" th:if="${uri.startsWith('/pay')}">Pay</li>
+            <li class="breadcrumb-item" th:if="${uri.startsWith('/deposit') || uri.startsWith('/withdraw')}"><a th:href="@{/profile}">Profile</a></li>
+            <li class="breadcrumb-item active" th:if="${uri.startsWith('/deposit')}">Deposit</li>
+            <li class="breadcrumb-item active" th:if="${uri.startsWith('/withdraw')}">Withdraw</li>
+        </ol>
+    </div>
+</div>
+</body>
+</html>

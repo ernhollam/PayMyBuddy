@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Pay My Buddy - Transfer</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+</head>
+
+<body>
+<div th:insert="fragments/header::header-nav"></div>
+<div id="content">
+    <section id="send-money" class="container">
+        <div id="send-money-title">
+            <h4 class="col">Send money</h4>
+            <button type="button" class="col btn btn-primary btn-right">Add connection</button>
+        </div>
+        <form id="send-money-form" th:action="@{/pay}" method="POST">
+            <div id="send-money-list-connections" class="col input-group">
+                <select th:field="*{connections}">
+                    <option th:each="connection : ${userConnections}"
+                            th:value="${connection.getEmail()}"
+                            th:text="#{${'connection.getFirstname()' + ' ' + 'connection.getLastname'}}">Connection
+                    </option>
+                </select>
+            </div>
+            <div id="send-money-amount">
+                <input type="number" min="0.01"
+                       step="0.01" value="0" placeholder="Amount"
+                       id="amount" name="amount" required>
+            </div>
+            <div id="send-money-pay">
+                <button type="button" class="btn btn-primary">Pay</button>
+            </div>
+        </form>
+        <div></div>
+    </section>
+
+    <section id="my-transactions">
+        <div class="transactions" th:unless="${#lists.isEmpty(allSeedStarters)}">
+
+            <h4 th:text="#{title.list}">My transactions</h4>
+
+            <table id="user-transactions">
+                <thead>
+                <tr>
+                    <th>Connections</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="transaction : ${userTransactions}">
+                    <td th:text="((${transaction.issuer} != ${authenticatedUser}) ? transaction.issuer : transaction.receiver)"></td>
+                    <td th:text="#{transaction.description}"></td>
+                    <td th:text="#{transaction.amount}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+</body>
+</html>
