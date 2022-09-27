@@ -14,22 +14,59 @@
 </head>
 
 <body>
-<form>
-    <button type="submit" class="btn btn-success">Pay My Buddy</button>
-    <div class="form-group-row has-feedback">
-        <span class="glyphicon glyphicon-envelope form-control-feedback" aria-hidden="true"></span>
-        <input type="email" class="form-control" id="email" placeholder="Email">
+<section class="container">
+    <div class="px-4 py-5 px-md-5 text-center text-lg-start">
+        <div class="card">
+            <div class="card-body ">
+                <!-- title-->
+                <div class="row-lg-6 mb-5 mb-lg-0">
+                    <h3 class="my-5 display-3 fw-bold ls-tight">
+                        Log in <br/>
+                    </h3>
+                    <!--img src="@{/images/logo}" class="rounded mx-auto d-block"-->
+                </div>
+                <!-- form-->
+                <div class="row-lg-6 mb-5 mb-lg-0">
+                    <form>
+                        <!-- Email input -->
+                        <div class="form-group ">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-envelope"></span>
+                                </div>
+                                <input class="form-control" id="email" name="email" type="email" placeholder="Email"/>
+                            </div>
+                        </div>
+                        <!-- Password input -->
+                        <div class="form-group ">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-asterisk"></span>
+                                </div>
+                                <input class="form-control" id="password" name="email" type="password" placeholder="Password"/>
+                            </div>
+                        </div>
+                        <!--remember me checkbox-->
+                        <div class="form-group-row  mb-4">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <!-- Login button -->
+                        <button type="submit" class="btn btn-primary btn-block mb-4">
+                            Log in
+                        </button>
+                    </form>
+                </div>
+                <!--sign up link-->
+                <div class="row-lg-6 mb-5 mb-lg-0">
+                    <h5 class="form-group-row">
+                        <a href="/signup">Create an account</a>
+                    </h5>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group-row has-feedback">
-        <span class="glyphicon glyphicon-asterisk form-control-feedback" aria-hidden="true"></span>
-        <input type="password" class="form-control" id="password" placeholder="Password">
-    </div>
-    <div class="form-group-row">
-        <input type="checkbox" class="form-check-input" id="rememberMe">
-        <label class="form-check-label" for="rememberMe">Remember me</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
+</section>
 </body>
 
 </html>
