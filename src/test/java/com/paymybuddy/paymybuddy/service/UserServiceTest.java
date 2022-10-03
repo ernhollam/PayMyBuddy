@@ -76,7 +76,7 @@ class UserServiceTest {
         doReturn(testUser)
                 .when(userRepository).save(any(User.class));
 
-        testUser = userService.createUser(emailAddress, password);
+        testUser = userService.createUser(testUser);
 
         verify(userRepository, times(1)).save(any(User.class));
     }
@@ -87,7 +87,7 @@ class UserServiceTest {
         String emailAddress = "username@domain";
         testUser.setEmail(emailAddress);
 
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser("username@domain", "123"));
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(testUser));
     }
 
     @Test
@@ -101,7 +101,7 @@ class UserServiceTest {
         doReturn(testUser)
                 .when(userRepository).save(any(User.class));
         // WHEN
-        testUser = userService.createUser("username@domain.com", "ABCDEF123");
+        testUser = userService.createUser(testUser);
         // THEN
         // asserting that created user is not null does not work, thus we check if the balance was actually set to
         // 0.00 during user creation
@@ -117,7 +117,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(any(String.class)))
                 .thenReturn(Optional.of(testUser));
         // THEN
-        assertThrows(EmailAlreadyUsedException.class, () -> userService.createUser("username@domain.com", "ABCDEF123"));
+        assertThrows(EmailAlreadyUsedException.class, () -> userService.createUser(testUser));
     }
 
     @Test

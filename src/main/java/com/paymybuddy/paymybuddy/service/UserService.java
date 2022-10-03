@@ -36,15 +36,14 @@ public class UserService {
     /**
      * Saves user to database.
      *
-     * @param email
-     *         valid email from user to save
-     * @param password
-     *         user's password
+     * @param user
+     *         user with firstname, lastname, email and password filled from signup form.
      *
      * @return User with id.
      */
     @Transactional
-    public User createUser(String email, String password) {
+    public User createUser(User user) {
+        String email = user.getEmail();
         if (isInvalidEmail(email)) {
             String invalidEmailMessage = "The email provided is invalid.";
             log.error(invalidEmailMessage);
@@ -59,11 +58,6 @@ public class UserService {
             log.error(errorMessage);
             throw new EmailAlreadyUsedException(errorMessage);
         }
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        if (user.getFirstName() == null) user.setFirstName("");
-        if (user.getLastName() == null) user.setLastName("");
         user.setBalance(new BigDecimal("0.00"));
         return userRepository.save(user);
     }

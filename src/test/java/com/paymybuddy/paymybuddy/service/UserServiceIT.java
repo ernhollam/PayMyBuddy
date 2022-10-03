@@ -34,7 +34,7 @@ public class UserServiceIT {
         user.setLastName("Lastname");
         user.setPassword("tawfzeklf");
 
-        user = userService.createUser(user.getEmail(), user.getPassword());
+        user = userService.createUser(user);
         id = user.getId();
     }
 
