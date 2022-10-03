@@ -12,53 +12,7 @@
 
 <body>
 
-<div id="transfer-header">
-    <!--navigation bar-->
-    <nav class="navbar navbar-expand-lg navbar-light justify-content-end">
-        <button class="btn btn-success mr-auto ml-2">Pay My Buddy</button>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse flex-grow-0" id="navbar">
-            <ul class="navbar-nav text-right">
-                <li class="nav-item"
-                    th:classappend="${page == 'home' ? 'active' : ''}">
-                    <a th:classappend="${page == 'home' ? 'text-primary' : ''}"
-                       class="nav-link"
-                       href="/home">Home<span class="sr-only" th:if="${page == 'home'}">(current)</span></a>
-                </li>
-                <li class="nav-item"
-                    th:classappend="${page == 'transfer' ? 'active' : ''}">
-                    <a th:classappend="${page == 'transfer' ? 'text-primary' : ''}"
-                       class="nav-link"
-                       href="/transfer">Transfer<span class="sr-only" th:if="${page == 'transfer'}">(current)</span></a>
-                </li>
-                <li class="nav-item"
-                    th:classappend="${page == 'profile' ? 'active' : ''}">
-                    <a th:classappend="${page == 'profile' ? 'text-primary' : ''}"
-                       class="nav-link"
-                       href="/profile">Profile<span class="sr-only" th:if="${page == 'profile'}">(current)</span></a>
-                </li>
-                <li class="nav-item"
-                    th:classappend="${page == 'contact' ? 'active' : ''}">
-                    <a th:classappend="${page == 'contact' ? 'text-primary' : ''}"
-                       class="nav-link"
-                       href="/contact">Contact<span class="sr-only" th:if="${page == 'contact'}">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/transfer">Logoff</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <!--breadcrumb-->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Transfer</li>
-        </ol>
-    </nav>
-</div>
+<header id="transfer-id" th:insert="fragments/header :: header"></header>
 
 <!--send money-->
 <div class="container">
