@@ -12,7 +12,7 @@
 <body>
 <header th:with="page=${page}">
     <!--navigation bar-->
-    <nav class="navbar navbar-expand-lg navbar-light justify-content-end">
+    <nav class="navbar navbar-expand-lg navbar-light justify-content-end" th:fragment="navbar">
         <button class="btn btn-success mr-auto ml-2">Pay My Buddy</button>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
             <span class="navbar-toggler-icon"></span>
@@ -50,7 +50,7 @@
         </div>
     </nav>
     <!--breadcrumb-->
-    <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb" th:fragment="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item" th:unless="${page == 'home'}"><a th:href="@{/home}">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'home'}">Home</li>
