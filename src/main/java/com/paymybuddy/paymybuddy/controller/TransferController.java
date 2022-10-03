@@ -27,6 +27,7 @@ public class TransferController {
 
     @GetMapping
     public String showTransferPage(Model model) {
+
         User                       connectedUser    = userService.getCurrentUser();
         List<TransactionViewModel> userTransactions = transactionService.getUserTransactions(connectedUser.getId());
         List<UserViewModel>        userConnections  = connectionService.getUserConnections(connectedUser);
@@ -34,6 +35,8 @@ public class TransferController {
         model.addAttribute("user", connectedUser);
         model.addAttribute("connections", userConnections);
         model.addAttribute("transactions", userTransactions);
+        model.addAttribute("page", "transfer");
+        model.addAttribute("amount", 0.00);
 
         return "transfer";
     }

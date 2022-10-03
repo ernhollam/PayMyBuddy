@@ -16,25 +16,37 @@
     <!--navigation bar-->
     <nav class="navbar navbar-expand-lg navbar-light justify-content-end">
         <button class="btn btn-success mr-auto ml-2">Pay My Buddy</button>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse flex-grow-0" id="navbar">
             <ul class="navbar-nav text-right">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
+                <li class="nav-item"
+                    th:classappend="${page == 'home' ? 'active' : ''}">
+                    <a th:classappend="${page == 'home' ? 'text-primary' : ''}"
+                       class="nav-link"
+                       href="/home">Home<span class="sr-only" th:if="${page == 'home'}">(current)</span></a>
                 </li>
-                <li class="nav-item active">
-                    <a class="nav-link text-primary" href="/transfer">Transfer<span class="sr-only">(current)</span></a>
+                <li class="nav-item"
+                    th:classappend="${page == 'transfer' ? 'active' : ''}">
+                    <a th:classappend="${page == 'transfer' ? 'text-primary' : ''}"
+                       class="nav-link"
+                       href="/transfer">Transfer<span class="sr-only" th:if="${page == 'transfer'}">(current)</span></a>
+                </li>
+                <li class="nav-item"
+                    th:classappend="${page == 'profile' ? 'active' : ''}">
+                    <a th:classappend="${page == 'profile' ? 'text-primary' : ''}"
+                       class="nav-link"
+                       href="/profile">Profile<span class="sr-only" th:if="${page == 'profile'}">(current)</span></a>
+                </li>
+                <li class="nav-item"
+                    th:classappend="${page == 'contact' ? 'active' : ''}">
+                    <a th:classappend="${page == 'contact' ? 'text-primary' : ''}"
+                       class="nav-link"
+                       href="/contact">Contact<span class="sr-only" th:if="${page == 'contact'}">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/profile">Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/contact">Contact</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logoff">Logoff</a>
+                    <a class="nav-link" href="/transfer">Logoff</a>
                 </li>
             </ul>
         </div>
@@ -57,25 +69,34 @@
             <button type="button" class="btn btn-primary">Add connection</button>
         </div>
         <!--select connection, amount and Pay button-->
-        <div id="send-money-body" class="d-flex justify-content-between mx-auto bd-highlight">
-            <select id="list-connections" name="payee" required>
-                <option value="" selected>Select a connection</option>
-                <option th:each="connection : ${connections}"
-                        th:value="${connection.getEmail()}"
-                        th:text="#{${'connection.getFirstname()' + ' ' + 'connection.getLastname'}}"></option>
-            </select>
-            <input id="description" type="text" name="description" th:field="*{description}" placeholder="Description" required maxlength="100">
-            <input type="number" min="0.01"
-                   step="0.01" th:field="*{amount}" placeholder="0€"
-                   id="amount" name="amount" required>
-            <button type="submit" class="btn btn-success">Pay</button>
-        </div>
+        <form id="send-money-body" class="row bg-light justify-content-center align-items-center mx-auto m-2" th:action="@{/pay}" method="POST">
+            <div class="col input-group">
+                <label>
+                    <select class="form-select m-4" id="to" name="to" required>
+                        <option value="">Select a connection</option>
+                        <option th:each="connection: ${connections}"
+                                th:value="${connection.getEmail()}"
+                                th:text="${connection.getFirstname() +' ' + connection.getLastname()}"></option>
+                    </select>
+                </label>
+            </div>
+            <div class="col input-group m-4">
+                <label>
+                    <input type="number" min="0.01"
+                           step="0.01" placeholder="0.00 €"
+                           id="amount" name="amount" required>
+                </label>
+            </div>
+            <div class="col-auto m-4">
+                <button type="submit" class="btn btn-success">Pay</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <!--my transactions-->
 <div class="container">
-    <div class="d-flex flex-column justify-content-center" id="my-transactions">
+    <div class="d-flex flex-column justify-content-center my-4" id="my-transactions">
         <div class="col-10 mx-auto d-flex justify-content-between align-items-end" id="my-transactions-header">
             <h5>My transactions</h5>
         </div>
@@ -94,9 +115,9 @@
                 <td></td>
             </tr>
             <tr th:each="transaction : ${transactions}">
-                <td th:text="((${transaction.issuer} != ${user}) ? transaction.issuer : transaction.receiver)">Haley</td>
-                <td th:text="#{transaction.description}">Restaurant bill share</td>
-                <td th:text="#{transaction.amount}">10.00 €</td>
+                <td th:text="((${transaction.issuer.getEmail()} == ${user.getEmail()}) ? ${transaction.payee.getFirstname()} : ${transaction.issuer.getFirstname()})">Haley</td>
+                <td th:text="${transaction.description}">Restaurant bill share</td>
+                <td th:text="${#strings.replace(#numbers.formatCurrency(transaction.amount), ',00', '')}">10.00 €</td>
             </tr>
             </tbody>
         </table>
