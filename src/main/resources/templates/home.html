@@ -15,7 +15,7 @@
 
 <header id="home-header" th:insert="fragments/header :: navbar"></header>
 
-<section class="container">
+<main class="container my-2">
     <!-- IMAGE -->
     <div class="row">
         <div class="col mr-auto my-3">
@@ -30,16 +30,16 @@
         Good to see you again, User! <br/>
     </h5>
     <!-- CARDS -->
-    <div class="row">
+    <div class="row my-2">
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-body" id="most-recent-connection">
                     <i class="fa-solid fa-user-group fa-2x" style="color: #74d36a"></i>
                     <h5 class="card-title">Most recent connection</h5>
-                    <p th:if="${mostRecentConnection == null}" class="card-text text-center font-italic">No connections. <a href="/add-connection" th:href="@{/add-connection}"
+                    <p th:if="${mostRecentConnection == null}" class="card-text font-italic" >No connections. <a href="/add-connection" th:href="@{/add-connection}"
                                                                                                                             class="text-primary">Add a connection</a>
                     </p>
-                    <p class="card-text text-center"
+                    <p class="card-text"
                        th:unless="${mostRecentConnection == null}"
                        th:text="${(mostRecentConnection.initializer.getEmail() == user.getEmail()) ?
                                mostRecentConnection.receiver.getFirstname() + ', added the ' + mostRecentConnection.getStartingDate()
@@ -53,10 +53,10 @@
                 <div class="card-body h-100">
                     <i class="fa-solid fa-money-bill-transfer fa-2x" style="color: #74d36a"></i>
                     <h5 class="card-title">Most recent transaction</h5>
-                    <p th:if="${mostRecentTransaction == null}" class="card-text text-center font-italic">No transactions. <a href="/transfer" th:href="@{/transfer}"
+                    <p th:if="${mostRecentTransaction == null}" class="card-text font-italic">No transactions. <a href="/transfer" th:href="@{/transfer}"
                                                                                                                               class="text-primary">Add transaction</a>
                     </p>
-                    <p class="text-center card-text"
+                    <p class="card-text"
                        th:unless="${mostRecentTransaction == null}"
                        th:text="${#strings.replace(#numbers.formatCurrency(mostRecentTransaction.amount), ',00', '')}
                                + ${(mostRecentTransaction.issuer.getEmail() == user.getEmail()) ?
@@ -67,29 +67,24 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-lg-4">
+        <div class="col-12 col-md-6 col-lg-4" >
             <div class="card h-100 border-0 " style="background-color: #f4f7fd">
                 <div class="card-body h-100">
                     <i class="fa-solid fa-wallet fa-2x" style="color: #74d36a"></i>
-                    <h5 class="card-title">Current balance</h5>
-                    <p class="card-text" th:text="${#strings.replace(#numbers.formatCurrency(user.getBalance()), ',00', '')}">358.29€</p>
-                    <div class="row justify-content-around align-items-center">
+                    <h5 class="card-title" th:fragment="current-balance-title">Current balance</h5>
+                    <p class="card-text" th:fragment="current-balance" th:text="${#strings.replace(#numbers.formatCurrency(user.getBalance()), ',00', '')}">358.29€</p>
+                    <div th:fragment="update-balance-button" class="row justify-content-around align-items-center">
                         <button type="submit" class="col-5 btn btn-primary"
-                                name="deposit" id="deposit"
-                                th:action="@{/deposit}">
-                            Deposit
-                        </button>
-                        <button type="button" class="col-5 btn btn-primary"
-                                name="withdraw" id="withdraw"
-                                th:action="@{/withdraw}">
-                            Withdraw
+                                name="update-balance" id="update-balance"
+                                th:action="@{/update-balance}">
+                            Update balance
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</main>
 
 <footer>
     <div th:replace="fragments/footer :: footer" class="text-center">Pay My Buddy | 2022 | &copy; <a href="https://github.com/ernhollam/PayMyBuddy" target="_blank">ernhollam</a></div>
