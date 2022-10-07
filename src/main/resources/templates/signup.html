@@ -22,7 +22,7 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <div class="row gx-lg-5 d-flex justify-content-center align-items-center">
+        <div class="col-8 mx-auto">
             <!--title and description-->
             <div class="row-lg-1 mb-3 mb-lg-0">
                 <h4 class="my-4 display-4 fw-bold ls-tight">
@@ -72,11 +72,9 @@
                                 <button type="submit" class="btn btn-primary col m-4">
                                     Sign up
                                 </button>
-                                <button type="button" class="btn btn-secondary col m-4"
-                                        href="/login"
-                                        th:href="@{/login}">
+                                <a type="button" class="btn btn-secondary text-white col m-4 " th:href="@{/login}">
                                     Cancel
-                                </button>
+                                </a>
                             </div>
                         </form>
                     </div>
@@ -87,13 +85,11 @@
 </main>
 
 <footer>
-    <div th:replace="fragments/footer :: footer">Pay My Buddy | 2022 | &copy; <a href="https://github.com/ernhollam/PayMyBuddy" target="_blank">ernhollam</a></div>
+    <div th:replace="fragments/footer :: footer" class="text-center">Pay My Buddy | 2022 | &copy; <a href="https://github.com/ernhollam/PayMyBuddy" target="_blank">ernhollam</a></div>
 </footer>
-
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
 
 </body>
 </html>

@@ -32,7 +32,6 @@ public class SignUpController {
     @PostMapping
     public String signUp(User user,
                          Model model) {
-
         try {
             userService.createUser(user);
             return "redirect:/login?created";
