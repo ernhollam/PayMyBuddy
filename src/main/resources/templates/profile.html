@@ -18,17 +18,17 @@
 <main class="container">
     <div class="col my-2 mb-4" id="current-balance">
         <div class="row mb-2" id="current-balance-title" th:insert="home::current-balance-title">
-            <h5>Current balance</h5>
+            <h4>Current balance</h4>
         </div>
         <div class="row d-flex justify-content-between" id="current-balance-body">
-            <div class="col" th:insert="home::current-balance">321.90€</div>
+            <div class="col display-4" th:insert="home::current-balance">321.90€</div>
             <!--TODO faire la page de deposit/withdraw-->
             <div class="col" th:insert="home::update-balance-button">Update balance</div>
         </div>
     </div>
     <div class="row my-2 mb-4">
         <div class="col" id="connections">
-            <h5 id="connections-title">Your connections</h5>
+            <h4 id="connections-title">Your connections</h4>
             <table id="connections-table" class="table table-striped justify-content-between mx-auto">
                 <thead class="bg-success">
                 <tr class="text-white">

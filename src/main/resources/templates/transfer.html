@@ -15,13 +15,30 @@
 <header id="transfer-header" th:insert="fragments/header :: header"></header>
 
 <main class="container">
+    <!-- display alert if user created-->
+    <div th:if="${added}"
+         th:text="${added}"
+         class="alert alert-success alert-dismissible fade show mb-lg-0"
+         role="alert"> Connection successfully added.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <!-- display alert if an error occurred-->
+    <div th:if="${error}"
+         th:text="${error}"
+         class="alert alert-danger alert-dismissible fade show mb-lg-0"
+         role="alert"> An error occurred while creating connection.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     <!--send money-->
     <div class="col my-2" id="send-money">
         <!--label and add connection button-->
         <div class="row mx-auto d-flex justify-content-between align-items-end" id="send-money-header">
-            <h5>Send money</h5>
-            <!--TODO faire la page d'ajout d'une connection-->
-            <button type="button" class="btn btn-primary">Add connection</button>
+            <h4>Send money</h4>
+            <a class="btn btn-primary" href="/add-connection" th:href="@{/transfer/add-connection}" role="button">Add Connection</a>
         </div>
         <!--select connection, amount and Pay button-->
         <div class="row">
@@ -51,7 +68,7 @@
     </div>
 
     <div class="col" id="my-transactions">
-        <h5 id="transactions-title">Your transactions</h5>
+        <h4 id="transactions-title">Your transactions</h4>
         <table id="transactions-table" class="table table-striped justify-content-between mx-auto">
             <thead class="bg-success">
             <tr class="text-white">
@@ -98,5 +115,9 @@
 <footer>
     <div th:replace="fragments/footer :: footer" class="text-center">Pay My Buddy | 2022 | &copy; <a href="https://github.com/ernhollam/PayMyBuddy" target="_blank">ernhollam</a></div>
 </footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 </body>
 </html>

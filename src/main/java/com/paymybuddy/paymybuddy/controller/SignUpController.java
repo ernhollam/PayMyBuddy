@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/signup")
@@ -30,14 +31,14 @@ public class SignUpController {
     }
 
     @PostMapping
-    public String signUp(User user,
-                         Model model) {
+    public String signUp(User user, Model model, RedirectAttributes redirAttrs) {
         try {
             userService.createUser(user);
-            return "redirect:/login?created";
+            redirAttrs.addFlashAttribute("created", "Congratulations, you can now pay your buddies!");
+            return "redirect:/login";
         } catch (IllegalArgumentException | EmailAlreadyUsedException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "redirect:/signup?error";
+            redirAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/signup";
         }
     }
 }

@@ -23,7 +23,7 @@
                     th:classappend="${page == 'home' ? 'active' : ''}">
                     <a th:classappend="${page == 'home' ? 'text-primary' : ''}"
                        class="nav-link"
-                       href="/home">Home<span class="sr-only" th:if="${page == 'home'}">(current)</span></a>
+                       href="/home" th:href="@{/}">Home<span class="sr-only" th:if="${page == 'home'}">(current)</span></a>
                 </li>
                 <li class="nav-item"
                     th:classappend="${page == 'transfer' ? 'active' : ''}">
@@ -52,7 +52,7 @@
     <!--breadcrumb-->
     <nav aria-label="breadcrumb" th:fragment="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item" th:unless="${page == 'home'}"><a th:href="@{/home}">Home</a></li>
+            <li class="breadcrumb-item" th:unless="${page == 'home'}"><a th:href="@{/}">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'home'}">Home</li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'profile'}">Profile</li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'contact'}">Contact</li>
@@ -60,7 +60,7 @@
             <li class="breadcrumb-item" th:if="${page== 'pay' || page == 'add-connection'}"><a th:href="@{/transfer}">Transfer</a></li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'add-connection'}">Add connection</li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'pay'}">Pay</li>
-            <li class="breadcrumb-item" th:if="${page == 'deposit' || page == 'withdraw'}"><a th:href="@{/transfer}">Profile</a></li>
+            <li class="breadcrumb-item" th:if="${page == 'deposit' || page == 'withdraw'}"><a th:href="@{/transfer}">Transfer</a></li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'deposit'}">Deposit</li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'withdraw'}">Withdraw</li>
         </ol>

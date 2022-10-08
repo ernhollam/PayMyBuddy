@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add connection</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+</head>
+
+<body>
+
+<header id="transfer-header" th:insert="fragments/header :: header"></header>
+<main class="container">
+
+    <div class="row-6 mb-5 mb-lg-0 my-4">
+        <div class="card">
+            <div class="card-body py-4 px-md-4">
+                <form method="post" th:action="@{/transfer/add-connection}">
+
+                    <div class="form-group">
+                        <label for="email">Please enter your contact's email:</label>
+                        <input type="email" th:value="${email}" class="form-control" id="email"
+                               placeholder="mycontact@email.com" required name="email">
+                    </div>
+                    <!--<div class="input-group m-2 justify-content-center">
+                            <input type="email" id="email" name="email" required
+                                   placeholder="mycontact@email.com"
+                                   th:value="${email}"
+                                   class="form-control envelope-icon">
+                    </div>-->
+
+                    <div class="row justify-content-center align-items-center mx-auto m-2">
+                        <button type="submit" class="btn btn-primary col-3 m-4">
+                            Submit
+                        </button>
+                        <a type="button" class="btn btn-secondary text-white col-3 m-4 " th:href="@{/transfer}">
+                            Cancel
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

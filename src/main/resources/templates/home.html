@@ -13,11 +13,10 @@
 
 <body>
 
-<header id="home-header" th:insert="fragments/header :: navbar"></header>
+<header id="home-header" th:insert="fragments/header :: header"></header>
 
 <main class="container my-2">
-    <!--TODO à refaire, c'est moche-->
-    <!-- IMAGE -->
+     <!--IMAGE
     <div class="row">
         <div class="col mr-auto my-3">
             <div class="text-center">
@@ -26,8 +25,8 @@
                      alt="PayMyBuddy logo">
             </div>
         </div>
-    </div>
-    <h5 class="ls-tight" th:text="${'Good to see you again, ' + user.getFirstName() + '!'}">
+    </div>-->
+    <h5 class="ls-tight display-4" th:text="${'Good to see you again, ' + user.getFirstName() + '!'}">
         Good to see you again, User! <br/>
     </h5>
     <!-- CARDS -->
@@ -36,8 +35,8 @@
             <div class="card h-100">
                 <div class="card-body" id="most-recent-connection">
                     <i class="fa-solid fa-user-group fa-2x" style="color: #74d36a"></i>
-                    <h5 class="card-title">Most recent connection</h5>
-                    <p th:if="${mostRecentConnection == null}" class="card-text font-italic" >No connections. <a href="/add-connection" th:href="@{/add-connection}"
+                    <h4 class="card-title">Most recent connection</h4>
+                    <p th:if="${mostRecentConnection == null}" class="card-text font-italic" >No connections. <a href="/add-connection" th:href="@{/transfer/add-connection}"
                                                                                                                             class="text-primary">Add a connection</a>
                     </p>
                     <p class="card-text"
@@ -53,7 +52,7 @@
             <div class="card h-100">
                 <div class="card-body h-100">
                     <i class="fa-solid fa-money-bill-transfer fa-2x" style="color: #74d36a"></i>
-                    <h5 class="card-title">Most recent transaction</h5>
+                    <h4 class="card-title">Most recent transaction</h4>
                     <p th:if="${mostRecentTransaction == null}" class="card-text font-italic">No transactions. <a href="/transfer" th:href="@{/transfer}"
                                                                                                                               class="text-primary">Add transaction</a>
                     </p>
@@ -72,8 +71,8 @@
             <div class="card h-100 border-0 " style="background-color: #f4f7fd">
                 <div class="card-body h-100">
                     <i class="fa-solid fa-wallet fa-2x" style="color: #74d36a"></i>
-                    <h5 class="card-title" th:fragment="current-balance-title">Current balance</h5>
-                    <p class="card-text" th:fragment="current-balance" th:text="${#strings.replace(#numbers.formatCurrency(user.getBalance()), ',00', '')}">358.29€</p>
+                    <h4 class="card-title" th:fragment="current-balance-title">Current balance</h4>
+                    <p class="card-text display-4" th:fragment="current-balance" th:text="${#strings.replace(#numbers.formatCurrency(user.getBalance()), ',00', '')}">358.29€</p>
                     <div th:fragment="update-balance-button" class="row justify-content-around align-items-center">
                         <button type="submit" class="col-5 btn btn-primary"
                                 name="update-balance" id="update-balance"

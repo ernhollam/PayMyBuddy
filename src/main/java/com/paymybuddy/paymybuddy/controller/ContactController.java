@@ -17,33 +17,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/contact")
 public class ContactController {
 
-    @Autowired
-    private UserService        userService;
-    @Autowired
-    private TransactionService transactionService;
-    @Autowired
-    private ConnectionService  connectionService;
+	@Autowired
+	private UserService        userService;
+	@Autowired
+	private TransactionService transactionService;
+	@Autowired
+	private ConnectionService  connectionService;
 
-    @GetMapping
-    public String showTransferPage(Model model) {
+	@GetMapping
+	public String showTransferPage(Model model) {
 
-        User                       connectedUser    = userService.getCurrentUser();
+		User connectedUser = userService.getCurrentUser();
 
-        model.addAttribute("user", connectedUser);
-        model.addAttribute("page", "contact");
-        model.addAttribute("contactForm", new ContactViewModel());
+		model.addAttribute("user", connectedUser);
+		model.addAttribute("page", "contact");
+		model.addAttribute("contactForm", new ContactViewModel());
 
-        return "contact";
-    }
+		return "contact";
+	}
 
-    @PostMapping
-    public String send(ContactViewModel contactForm, Model model) {
-        try {
-            // TODO implement contact form
-            return "redirect:/contact?sent";
-        } catch (IllegalArgumentException | EmailAlreadyUsedException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "redirect:/contact?error";
-        }
-    }
+	@PostMapping
+	public String send(ContactViewModel contactForm, Model model) {
+		return "redirect:/contact?sent";
+	}
 }

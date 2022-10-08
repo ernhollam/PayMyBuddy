@@ -12,17 +12,25 @@
 <body>
 <main class="container">
     <div class="px-4 py-5 px-md-5 text-center text-lg-start align-items-center justify-content-around">
+        <!-- display alert if user created-->
+        <div th:if="${created}"
+             th:text="${created.value}"
+             class="alert alert-success alert-dismissible fade show mb-lg-0"
+             role="alert"> User successfully created.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
         <!-- display alert if an error occurred-->
-        <div th:if="${param.error}"
-             th:text="${errorMessage}"
+        <div th:if="${error}"
+             th:text="${error}"
              class="alert alert-danger alert-dismissible fade show mb-lg-0"
              role="alert"> Error message.
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <div class="row gx-lg-6 d-flex justify-content-center align-items-center">
-
+        <div class="col-5 mx-auto">
             <!--form-->
             <div class="row-lg-6 mb-5 mb-lg-0 my-4">
                 <div class="card">
@@ -60,7 +68,7 @@
                             </button>
 
                             <!--sign up link-->
-                            <div class="row mb-lg-0 mb-5">
+                            <div class="row  mx-auto my-auto">
                                 <p class="text-center">
                                     New here? <a th:href="@{/signup}" href="/signup">Create an account</a>
                                 </p>

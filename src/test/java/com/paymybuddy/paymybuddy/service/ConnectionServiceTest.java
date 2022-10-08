@@ -124,6 +124,14 @@ class ConnectionServiceTest {
     }
 
     @Test
+    @DisplayName("Adding self email should throw exception")
+    public void updateUser_usingSelfEmail_shouldThrow_exception() {
+
+        assertThrows(IllegalArgumentException.class,
+                () -> connectionService.createConnectionBetweenTwoUsers(initializer, initializer.getEmail()));
+    }
+
+    @Test
     @DisplayName("Adding a connection should connect initializer and receiver")
     void addConnection_shouldConnect_initializerAndReceiver() {
         String email = "tribbianijoey@friends.com";

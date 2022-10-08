@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 @Controller
-@RequestMapping("/home")
+@RequestMapping("/")
 public class HomeController {
 
     @Autowired

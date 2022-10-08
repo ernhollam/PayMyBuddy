@@ -158,6 +158,6 @@ public class UserService {
 
     public User getCurrentUser() {
         /*Authentication authentication = SecurityContextHolder.getContext().getAuthentication();*/
-        return getUserById(4).get();
+        return getUserById(1).get();
     }
 }
