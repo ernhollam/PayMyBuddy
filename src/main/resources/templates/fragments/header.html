@@ -29,13 +29,13 @@
                     th:classappend="${page == 'transfer' ? 'active' : ''}">
                     <a th:classappend="${page == 'transfer' ? 'text-primary' : ''}"
                        class="nav-link"
-                       href="/transfer">Transfer<span class="sr-only" th:if="${page == 'transfer'}">(current)</span></a>
+                       href="/transfer">Transfer<span class="sr-only" th:if="${page == 'transfer' || page == 'add-connection'}">(current)</span></a>
                 </li>
                 <li class="nav-item"
                     th:classappend="${page == 'profile' ? 'active' : ''}">
                     <a th:classappend="${page == 'profile' ? 'text-primary' : ''}"
                        class="nav-link"
-                       href="/profile">Profile<span class="sr-only" th:if="${page == 'profile'}">(current)</span></a>
+                       href="/profile">Profile<span class="sr-only" th:if="${page == 'profile' ||page == 'update-balance'}">(current)</span></a>
                 </li>
                 <li class="nav-item"
                     th:classappend="${page == 'contact' ? 'active' : ''}">
@@ -60,9 +60,8 @@
             <li class="breadcrumb-item" th:if="${page== 'pay' || page == 'add-connection'}"><a th:href="@{/transfer}">Transfer</a></li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'add-connection'}">Add connection</li>
             <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'pay'}">Pay</li>
-            <li class="breadcrumb-item" th:if="${page == 'deposit' || page == 'withdraw'}"><a th:href="@{/transfer}">Transfer</a></li>
-            <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'deposit'}">Deposit</li>
-            <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'withdraw'}">Withdraw</li>
+            <li class="breadcrumb-item" th:if="${page == 'update-balance'}"><a th:href="@{/profile}">Profile</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:if="${page == 'update-balance'}">Update balance</li>
         </ol>
     </nav>
 </header>

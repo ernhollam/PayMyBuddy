@@ -12,26 +12,20 @@
 
 <body>
 
-<header id="transfer-header" th:insert="fragments/header :: header"></header>
+<header id="add-connection-header" th:insert="fragments/header :: header"></header>
 <main class="container">
 
     <div class="row-6 mb-5 mb-lg-0 my-4">
         <div class="card">
             <div class="card-body py-4 px-md-4">
                 <form method="post" th:action="@{/transfer/add-connection}">
-
+                    <!--email input-->
                     <div class="form-group">
-                        <label for="email">Please enter your contact's email:</label>
+                        <label for="email">Please enter your Buddy's email:</label>
                         <input type="email" th:value="${email}" class="form-control" id="email"
-                               placeholder="mycontact@email.com" required name="email">
+                               placeholder="mysoontobebuddy@email.com" required name="email">
                     </div>
-                    <!--<div class="input-group m-2 justify-content-center">
-                            <input type="email" id="email" name="email" required
-                                   placeholder="mycontact@email.com"
-                                   th:value="${email}"
-                                   class="form-control envelope-icon">
-                    </div>-->
-
+                    <!--submit and cancel buttons-->
                     <div class="row justify-content-center align-items-center mx-auto m-2">
                         <button type="submit" class="btn btn-primary col-3 m-4">
                             Submit
@@ -40,11 +34,15 @@
                             Cancel
                         </a>
                     </div>
-
                 </form>
             </div>
         </div>
     </div>
 </main>
+
+<footer>
+    <div th:replace="fragments/footer :: footer" class="text-center">Pay My Buddy | 2022 | &copy; <a href="https://github.com/ernhollam/PayMyBuddy" target="_blank">ernhollam</a></div>
+</footer>
+
 </body>
 </html>

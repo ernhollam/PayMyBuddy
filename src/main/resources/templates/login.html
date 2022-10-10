@@ -12,25 +12,26 @@
 <body>
 <main class="container">
     <div class="px-4 py-5 px-md-5 text-center text-lg-start align-items-center justify-content-around">
-        <!-- display alert if user created-->
+        <!-- display alert if user successfully created-->
         <div th:if="${created}"
-             th:text="${created.value}"
-             class="alert alert-success alert-dismissible fade show mb-lg-0"
-             role="alert"> User successfully created.
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+             class="col-6 mx-auto alert alert-success alert-dismissible fade show mb-lg-0 my-2"
+             role="alert">
+            <h5 class="alert-heading">Congratulations!</h5>
+            <p th:text="${created}">Success message
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button></p>
         </div>
         <!-- display alert if an error occurred-->
         <div th:if="${error}"
              th:text="${error}"
-             class="alert alert-danger alert-dismissible fade show mb-lg-0"
+             class="col-6 mx-auto alert alert-danger alert-dismissible fade show mb-lg-0"
              role="alert"> Error message.
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <div class="col-5 mx-auto">
+        <div class="col-6 mx-auto">
             <!--form-->
             <div class="row-lg-6 mb-5 mb-lg-0 my-4">
                 <div class="card">

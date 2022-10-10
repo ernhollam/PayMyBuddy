@@ -16,6 +16,16 @@
 
 <!--profile information-->
 <main class="container">
+    <!-- display alert if action successful-->
+    <div th:if="${success}"
+         class="alert alert-success alert-dismissible fade show mb-lg-0 my-2"
+         role="alert">
+        <h5 class="alert-heading">Success</h5>
+        <p th:text="${success}">Message.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+    </div>
     <div class="col my-2 mb-4" id="current-balance">
         <div class="row mb-2" id="current-balance-title" th:insert="home::current-balance-title">
             <h4>Current balance</h4>
@@ -57,5 +67,9 @@
 <footer>
     <div th:replace="fragments/footer :: footer" class="text-center">Pay My Buddy | 2022 | &copy; <a href="https://github.com/ernhollam/PayMyBuddy" target="_blank">ernhollam</a></div>
 </footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 </body>
 </html>

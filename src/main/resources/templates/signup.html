@@ -14,13 +14,14 @@
 <main class="container">
     <div class="px-4 py-5 px-md-5 text-center text-lg-start align-items-center justify-content-around">
         <!-- display alert if an error occurred-->
-        <div th:if="${param.error}"
-             th:text="${errorMessage}"
-             class="alert alert-danger alert-dismissible fade show mb-lg-0"
-             role="alert"> Error message.
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div th:if="${error}"
+             class="col-8 mx-auto alert alert-danger alert-dismissible fade show mb-lg-0 my-2"
+             role="alert">
+            <h5 class="alert-heading">An error occurred:</h5>
+            <p th:text="${error}">Error message.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
         </div>
         <div class="col-8 mx-auto">
             <!--title and description-->
