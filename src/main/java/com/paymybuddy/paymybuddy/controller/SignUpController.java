@@ -34,7 +34,7 @@ public class SignUpController {
     public String signUp(User user, Model model, RedirectAttributes redirAttrs) {
         try {
             userService.createUser(user);
-            redirAttrs.addFlashAttribute("created", "Congratulations, you can now pay your buddies!");
+            redirAttrs.addFlashAttribute("created", "You can now take full advantage of PayMyBuddy!");
             return "redirect:/login";
         } catch (IllegalArgumentException | EmailAlreadyUsedException e) {
             redirAttrs.addFlashAttribute("error", e.getMessage());

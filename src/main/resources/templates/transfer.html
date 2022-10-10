@@ -16,22 +16,24 @@
 
 <main class="container">
     <!-- display alert if user created-->
-    <div th:if="${added}"
-         th:text="${added}"
-         class="alert alert-success alert-dismissible fade show mb-lg-0"
-         role="alert"> Connection successfully added.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div th:if="${success}"
+         class="alert alert-success alert-dismissible fade show mb-lg-0 my-2"
+         role="alert">
+        <h5 class="alert-heading">Successful</h5>
+        <p th:text="${success}">Success message!
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
     </div>
     <!-- display alert if an error occurred-->
     <div th:if="${error}"
-         th:text="${error}"
-         class="alert alert-danger alert-dismissible fade show mb-lg-0"
-         role="alert"> An error occurred while creating connection.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+         class="alert alert-danger alert-dismissible fade show mb-lg-0 my-2"
+         role="alert">
+        <h5 class="alert-heading">An error occurred:</h5>
+        <p th:text="${error}">Error message.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
     </div>
     <!--send money-->
     <div class="col my-2" id="send-money">
@@ -42,10 +44,12 @@
         </div>
         <!--select connection, amount and Pay button-->
         <div class="row">
-            <form id="send-money-body" class="row bg-light d-flex justify-content-around align-items-center m-2 w-100" th:action="@{/user/pay}" method="POST">
+            <form id="send-money-body"
+                  class="row bg-light d-flex justify-content-between align-items-center m-2 w-100"
+                  th:action="@{/transfer/pay}" method="post" th:object="${transferForm}">
                 <div class="col input-group">
                     <label>
-                        <select class="form-select m-4" id="to" name="to" required>
+                        <select class="form-select m-4" id="payee" name="payee" th:field="*{payeeEmail}" required>
                             <option value="">Select a connection</option>
                             <option th:each="connection: ${connections}"
                                     th:value="${connection.getEmail()}"
@@ -57,11 +61,13 @@
                     <label>
                         <input type="number" min="0.01"
                                step="0.01" placeholder="0.00 €"
-                               id="amount" name="amount" required>
+                               id="amount" name="amount" required
+                               th:field="*{amount}">
                     </label>
                 </div>
                 <div class="col-auto m-4">
-                    <button type="submit" class="btn btn-success">Pay</button>
+                    <button class="btn btn-success" href="/pay" th:href="@{/transfer/pay}" role="button"
+                    name="action" value="redirect">Pay</button>
                 </div>
             </form>
         </div>
