@@ -4,6 +4,8 @@ import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.Connection;
 import com.paymybuddy.paymybuddy.model.User;
+import com.paymybuddy.paymybuddy.model.viewmodel.ConnectionViewModel;
+import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +31,15 @@ public class ConnectionService {
 	@Autowired
 	Clock          clock;
 
-	public List<User> getUserConnections(User user) {
-		Integer    userId      = user.getId();
-		List<User> connections = new ArrayList<>();
+	/**
+	 * List all user's connection
+	 *
+	 * @param user user for which the connections are wanted
+	 * @return a list of user with their name, first name, last name and balance
+	 */
+	public List<UserViewModel> getUserConnections(User user) {
+		Integer             userId      = user.getId();
+		List<UserViewModel> connections = new ArrayList<>();
 		// Get all connections where user is involved
 		List<Connection> connectionsWhereUserIsInvolved = connectionRepository
 				.findByInitializerOrReceiver(user, user);
@@ -41,64 +49,115 @@ public class ConnectionService {
 			User initializer = connection.getInitializer();
 			User receiver    = connection.getReceiver();
 			if (userId.equals(initializer.getId())) {
-				connections.add(receiver);
+				connections.add(UserService.userToViewModel(receiver));
 			} else if (userId.equals(receiver.getId())) {
-				connections.add(initializer);
+				connections.add(UserService.userToViewModel(initializer));
 			}
 		}
 		log.info("Connections for " + user.getEmail() + ":\n" + connections);
 		return connections;
 	}
 
+	/**
+	 * Creates a connection between two users and saves it to database.
+	 *
+	 * @param initializer connection initializer
+	 * @param email       buddy to add
+	 * @return connection object
+	 */
 	@Transactional
-	public Connection addConnection(User initializer, String email) {
+	public Connection createConnectionBetweenTwoUsers(User initializer, String email) {
 		if (UserService.isInvalidEmail(email)) {
 			String invalidEmailMessage = "The email provided is invalid.";
 			log.error(invalidEmailMessage);
 			throw new IllegalArgumentException(invalidEmailMessage);
+		}
+		if (email.equalsIgnoreCase(initializer.getEmail())) {
+			log.error("You are trying to add yourself!");
+			throw new IllegalArgumentException("You are trying to add yourself!");
+		}
+		Optional<User> optionalReceiver = userRepository.findByEmail(email);
+		if (optionalReceiver.isEmpty()) {
+			// Check if a user with specified email exists
+			String errorMessage = "Email " + email + " does not match any buddy.";
+			log.error(errorMessage);
+			throw new BuddyNotFoundException(errorMessage);
+		}
+		User receiver = optionalReceiver.get();
+		if (getUserConnections(initializer).contains(UserService.userToViewModel(receiver))) {
+			String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy!";
+			log.error(errorMessage);
+			throw new AlreadyABuddyException(errorMessage);
 		} else {
-			Optional<User> optionalReceiver = userRepository.findByEmail(email);
-			if (optionalReceiver.isEmpty()) {
-				// Check if a user with specified email exists
-				String errorMessage = "Email " + email + " does not match any buddy.";
-				log.error(errorMessage);
-				throw new BuddyNotFoundException(errorMessage);
-			} else {
-				User receiver = optionalReceiver.get();
-				if (getUserConnections(initializer).contains(receiver)) {
-					String errorMessage = receiver.getFirstName() + " " + receiver.getLastName() + " is already a Buddy " +
-										  "of yours!.";
-					log.error(errorMessage);
-					throw new AlreadyABuddyException(errorMessage);
-				} else {
-					// Create connection with both users
-					Connection connection = new Connection();
-					connection.setInitializer(initializer);
-					connection.setReceiver(receiver);
-					connection.setStartingDate(LocalDateTime.now(clock));
-					// Add connection to initializer's initiatedConnections
-					initializer.getInitializedConnections().add(connection);
-					// Add connection to receiver's receivedConnections
-					receiver.getReceivedConnections().add(connection);
-					return saveConnection(connection);
-				}
-			}
+			// Create connection with both users
+			log.info("Creating new connection between " +
+					initializer.getEmail() +
+					" and " + receiver.getEmail() + ".");
+			return saveConnection(createConnection(initializer, receiver));
 		}
 
 	}
+
+	/**
+	 * Creates a connection object.
+	 *
+	 * @param initializer connection initializer
+	 * @param receiver    connection receiver
+	 * @return connection object
+	 */
+	protected Connection createConnection(User initializer, User receiver) {
+		Connection connection = new Connection();
+		connection.setInitializer(initializer);
+		connection.setReceiver(receiver);
+		connection.setStartingDate(LocalDateTime.now(clock));
+		// Add connection to initializer's initiatedConnections
+		initializer.getInitializedConnections().add(connection);
+		// Add connection to receiver's receivedConnections
+		receiver.getReceivedConnections().add(connection);
+		return connection;
+	}
+
+	/**
+	 * Saves connection to database.
+	 *
+	 * @param connection connection to save
+	 * @return saved connection
+	 */
 	@Transactional
 	public Connection saveConnection(Connection connection) {
 		return connectionRepository.save(connection);
 	}
 
-	@Transactional
-	public void deleteInitiatedConnections(User user) {
-		connectionRepository.deleteByInitializer(user);
+	/**
+	 * Lists all connections in data base
+	 *
+	 * @return a list of connections
+	 */
+	public List<ConnectionViewModel> getConnections() {
+		Iterable<Connection>      connections          = connectionRepository.findAll();
+		List<ConnectionViewModel> connectionViewModels = new ArrayList<>();
+		// extract info from user to user view model
+		connections.forEach(connection -> connectionViewModels.add(connectionToViewModel(connection)));
+		return connectionViewModels;
 	}
 
-	@Transactional
-	public void deleteReceivedConnections(User user) {
-		connectionRepository.deleteByReceiver(user);
+	/**
+	 * Gets a connection by its ID.
+	 *
+	 * @param id connection to find
+	 * @return Optional connection
+	 */
+	public Optional<ConnectionViewModel> getConnectionById(Integer id) {
+		if (connectionRepository.findById(id).isPresent()) {
+			return Optional.of(connectionToViewModel(connectionRepository.findById(id).get()));
+		} else {
+			return Optional.empty();
+		}
 	}
 
+	public static ConnectionViewModel connectionToViewModel(Connection connection) {
+		return new ConnectionViewModel(connection.getId(), UserService.userToViewModel(connection.getInitializer()),
+				UserService.userToViewModel(connection.getReceiver()),
+				connection.getStartingDate());
+	}
 }
