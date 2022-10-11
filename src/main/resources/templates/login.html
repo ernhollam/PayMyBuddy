@@ -25,11 +25,29 @@
                     <span aria-hidden="true">&times;</span>
                 </button></p>
         </div>
+        <!--Successful logout-->
+        <div th:if="${param.logout}"
+             class="col-6 mx-auto alert alert-success alert-dismissible fade show mb-lg-0 my-2"
+             role="alert">
+            <h5 class="alert-heading">Succesfully logged out</h5>
+            <p>Hope to see you soon!
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button></p>
+        </div>
         <!-- display alert if an error occurred-->
         <div th:if="${error}"
              th:text="${error}"
              class="col-6 mx-auto alert alert-danger alert-dismissible fade show mb-lg-0"
              role="alert"> Error message.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <!--Alert message when login error-->
+        <div th:if="${param.error}"
+             class="col-6 mx-auto alert alert-danger alert-dismissible fade show mb-lg-0"
+             role="alert"> An error occurred during log in.
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
