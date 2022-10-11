@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -34,9 +35,10 @@ public class TransferController {
 	@GetMapping
 	public String showTransferPage(Model model) {
 
-		User                       connectedUser    = userService.getCurrentUser();
+		User connectedUser = userService.getCurrentUser();
 		List<TransactionViewModel> userTransactions = transactionService.getUserTransactions(connectedUser.getId());
-		List<UserViewModel>        userConnections  = connectionService.getUserConnections(connectedUser);
+		userTransactions.sort(Comparator.comparing(TransactionViewModel :: getDate).reversed());
+		List<UserViewModel> userConnections = connectionService.getUserConnections(connectedUser);
 
 		model.addAttribute("user", connectedUser);
 		model.addAttribute("connections", userConnections);
@@ -76,6 +78,7 @@ public class TransferController {
 	public String pay(@RequestParam String action, TransferViewModel transferForm, Model model,
 			RedirectAttributes redirAttrs) {
 		try {
+			model.addAttribute("page", "pay");
 			switch (action) {
 				case "pay":
 					if (userService.getUserByEmail(transferForm.getPayeeEmail()).isEmpty()) {
@@ -90,10 +93,10 @@ public class TransferController {
 							"You successfully transferred " + transferForm.getAmount() + "€ to " + transferForm.getPayeeEmail());
 					break;
 				case "redirect":
-					model.addAttribute("page", "pay");
 					model.addAttribute("transferForm", transferForm);
 					model.addAttribute("amountWithFee",
-							transactionService.calculateAmountWithFee(transferForm.getAmount()).get("amountWithFee").toString());
+							transactionService.calculateAmountWithFee(transferForm.getAmount()).get("amountWithFee")
+									.toString());
 					return "pay";
 			}
 		} catch (IllegalArgumentException | BuddyNotFoundException | AlreadyABuddyException e) {

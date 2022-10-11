@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Pay My Buddy - Transfer</title>
+    <title>Pay My Buddy</title>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
@@ -26,16 +26,17 @@
                        href="/home" th:href="@{/}">Home<span class="sr-only" th:if="${page == 'home'}">(current)</span></a>
                 </li>
                 <li class="nav-item"
-                    th:classappend="${page == 'transfer' ? 'active' : ''}">
-                    <a th:classappend="${page == 'transfer' ? 'text-primary' : ''}"
+                    th:classappend="${page == 'transfer' || page == 'add-connection' || page == 'pay' ? 'active' : ''}">
+                    <a th:classappend="${page == 'transfer' || page == 'add-connection' || page == 'pay' ? 'text-primary' : ''}"
                        class="nav-link"
-                       href="/transfer">Transfer<span class="sr-only" th:if="${page == 'transfer' || page == 'add-connection'}">(current)</span></a>
+                       href="/transfer">Transfer<span class="sr-only"
+                                                      th:if="${page == 'transfer' || page == 'add-connection' || page == 'pay'}">(current)</span></a>
                 </li>
                 <li class="nav-item"
-                    th:classappend="${page == 'profile' ? 'active' : ''}">
-                    <a th:classappend="${page == 'profile' ? 'text-primary' : ''}"
+                    th:classappend="${page == 'profile' || page == 'update-balance' ? 'active' : ''}">
+                    <a th:classappend="${page == 'profile' || page == 'update-balance' ? 'text-primary' : ''}"
                        class="nav-link"
-                       href="/profile">Profile<span class="sr-only" th:if="${page == 'profile' ||page == 'update-balance'}">(current)</span></a>
+                       href="/profile">Profile<span class="sr-only" th:if="${page == 'profile' || page == 'update-balance'}">(current)</span></a>
                 </li>
                 <li class="nav-item"
                     th:classappend="${page == 'contact' ? 'active' : ''}">
@@ -44,7 +45,7 @@
                        href="/contact">Contact<span class="sr-only" th:if="${page == 'contact'}">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/transfer">Logoff</a>
+                    <a class="nav-link" href="/login">Logoff</a>
                 </li>
             </ul>
         </div>

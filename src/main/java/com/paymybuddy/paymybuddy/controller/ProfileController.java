@@ -44,6 +44,7 @@ public class ProfileController {
 	@GetMapping("/update-balance")
 	public String showUpdateBalancePage(Model model) {
 		model.addAttribute("page", "update-balance");
+		model.addAttribute("user", userService.getCurrentUser());
 		return "update-balance";
 	}
 

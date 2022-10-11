@@ -3,11 +3,14 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Pay your Buddy!</title>
+    <title>Pay a Buddy!</title>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
           crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-maxlength/1.7.0/bootstrap-maxlength.min.js"></script>
 </head>
 
 <body>
@@ -20,9 +23,9 @@
          role="alert">
         <h4 class="alert-heading">An error occurred:</h4>
         <p th:text="${error}">Error message.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
     </div>
     <!--card-->
     <div class="row-6 mb-5 mb-lg-0 my-4">
@@ -46,7 +49,7 @@
                                id="amount" name="amount" required
                                th:field="*{amount}"
                                class="form-control row-9" readonly>
-                        <small id="feeWarningBlock" class="form-text text-danger">
+                        <small id="feeWarningBlock" class="text-danger">
                             <p th:text="${'You will pay a total amount of ' + amountWithFee + '€.'}">
                                 You will pay a total amount of 15.58€.</p>
                         </small>
@@ -55,8 +58,8 @@
                     <div class="form-group">
                         <label for="description">Please enter a short description:</label>
                         <textarea type="text" th:field="*{description}" class="form-control" id="description" name="description"
-                               placeholder="Everyday is bank account, and time is our currency"
-                               maxlength="140" required>
+                                  placeholder="Everyday is a bank account, and time is our currency"
+                                  maxlength="140" rows="2" required>
                         </textarea>
                         <small id="descriptionHelpBlock" class="form-text text-muted">
                             <!--TODO: mettre à jour le fichier create.sql pour contraindre 140 caractères-->
@@ -66,7 +69,7 @@
                     <!--deposit and withdrawal buttons-->
                     <div class="row justify-content-center align-items-center mx-auto m-2">
                         <button type="submit" class="btn btn-success col-3 m-4"
-                        name="action" value="pay">
+                                name="action" value="pay">
                             Pay
                         </button>
                     </div>
@@ -80,8 +83,33 @@
     <div th:replace="fragments/footer :: footer" class="text-center my-2">Pay My Buddy | 2022 | &copy; <a href="https://github.com/ernhollam/PayMyBuddy" target="_blank">ernhollam</a></div>
 </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+<script type="text/javascript">
+function countCharacters() {
+var max = $(this).attr("maxlength");
+var length = $(this).val().length;
+var counter = max - length;
+var helper = $(this).next(".form-text");
+// Switch to the singular if there's exactly 1 character remaining
+if (counter !== 1) {
+helper.text(counter + " characters remaining");
+} else {
+helper.text(counter + " character remaining");
+}
+// Make it red if there are 0 characters remaining
+if (counter === 0) {
+helper.removeClass("text-muted");
+helper.addClass("text-danger");
+} else {
+helper.removeClass("text-danger");
+helper.addClass("text-muted");
+}
+}
+
+$(document).ready(function () {
+$(".form-control").each(countCharacters);
+$(".form-control").keyup(countCharacters);
+});
+</script>
 </body>
 </html>
