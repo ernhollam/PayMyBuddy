@@ -32,17 +32,14 @@ public class UserController {
     /**
      * Add new user.
      *
-     * @param email
-     *         user email
-     * @param password
-     *         user password
+     * @param user user with firstname, lastname, email and password.
      *
      * @return User saved or exception if email already used
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestParam String email, @RequestParam String password) {
-        return userService.createUser(email, password);
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
     }
 
     /**

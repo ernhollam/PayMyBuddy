@@ -210,4 +210,9 @@ class TransactionServiceTest {
         assertEquals(result.getAmount(), transaction.getAmount());
         assertTrue(result.getDescription().equalsIgnoreCase(transaction.getDescription()));
     }
+
+    // TODO unit test for "calculateAmountWithFee()"
+	@Test
+	void calculateAmountWithFee() {
+	}
 }

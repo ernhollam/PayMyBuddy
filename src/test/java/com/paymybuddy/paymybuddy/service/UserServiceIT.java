@@ -34,7 +34,7 @@ public class UserServiceIT {
         user.setLastName("Lastname");
         user.setPassword("tawfzeklf");
 
-        user = userService.createUser(user.getEmail(), user.getPassword());
+        user = userService.createUser(user);
         id = user.getId();
     }
 
@@ -58,7 +58,6 @@ public class UserServiceIT {
     @Test
     @DisplayName("Withdraw should subtract money to user's balance")
     void withdraw() {
-        //TODO demander pour le solde, on l'initialise à 0 et en faisant ce test, on le met à -50
         String amount = "50";
 
         userService.withdraw(user, amount);
