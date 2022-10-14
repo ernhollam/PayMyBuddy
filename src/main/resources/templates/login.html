@@ -47,7 +47,9 @@
         <!--Alert message when login error-->
         <div th:if="${param.error}"
              class="col-6 mx-auto alert alert-danger alert-dismissible fade show mb-lg-0"
-             role="alert"> Invalid password and login information.
+             role="alert">
+            <h5 class="alert-heading">Error during login</h5>
+            <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -67,7 +69,7 @@
                                     <div class="input-group-addon">
                                         <span class="glyphicon glyphicon-envelope"></span>
                                     </div>
-                                    <input class="form-control" id="email" name="email" type="email" placeholder="Email"/>
+                                    <input class="form-control" id="email" name="email" type="email" placeholder="Email" autofocus/>
                                 </div>
                             </div>
                             <!-- Password input -->

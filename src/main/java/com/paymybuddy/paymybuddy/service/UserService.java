@@ -5,15 +5,12 @@ import com.paymybuddy.paymybuddy.constants.Fee;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
 import com.paymybuddy.paymybuddy.model.User;
-import com.paymybuddy.paymybuddy.model.UserPrincipal;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +24,7 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class UserService implements UserDetailsService {
+public class UserService {
 
 	/**
 	 * Instance of UserRepository.
@@ -165,18 +162,5 @@ public class UserService implements UserDetailsService {
 		return getUserByEmail(principal.getEmail()).get();
 	}
 
-	/**
-	 * Spring security implementation of loadByUsername.
-	 * @param username email provided during login
-	 * @return a UserDetails object
-	 * @throws BuddyNotFoundException Exception thrown if the provided email does not match any user
-	 */
-	@Override public UserDetails loadUserByUsername(String username) throws BuddyNotFoundException {
-		// source: https://youtu.be/TNt3GHuayXs
-        Optional<User> user = userRepository.findByEmail(username);
-		if (user.isEmpty()) {
-			throw new BuddyNotFoundException("Email " + username + " does not match any Buddy.");
-		}
-		return new UserPrincipal(user.get());
-	}
+
 }
