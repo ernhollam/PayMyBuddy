@@ -30,7 +30,7 @@ public class ProfileController {
 	@GetMapping
 	public String showProfilePage(Model model) {
 
-		User                connectedUser = userService.getCurrentUser();
+		User                connectedUser = userService.getAuthenticatedUser();
 		List<UserViewModel> connections   = connectionService.getUserConnections(connectedUser);
 
 		model.addAttribute("user", connectedUser);
@@ -44,7 +44,7 @@ public class ProfileController {
 	@GetMapping("/update-balance")
 	public String showUpdateBalancePage(Model model) {
 		model.addAttribute("page", "update-balance");
-		model.addAttribute("user", userService.getCurrentUser());
+		model.addAttribute("user", userService.getAuthenticatedUser());
 		return "update-balance";
 	}
 
@@ -54,10 +54,10 @@ public class ProfileController {
 			String strAmount = String.valueOf(amount);
 			switch (action) {
 				case "deposit" -> {
-					userService.deposit(userService.getCurrentUser(), strAmount);
+					userService.deposit(userService.getAuthenticatedUser(), strAmount);
 				}
 				case "withdrawal" -> {
-					userService.withdraw(userService.getCurrentUser(), strAmount);
+					userService.withdraw(userService.getAuthenticatedUser(), strAmount);
 				}
 			}
 			redirAttrs.addFlashAttribute("success",

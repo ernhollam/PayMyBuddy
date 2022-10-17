@@ -9,7 +9,6 @@ import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -153,14 +152,12 @@ public class UserService {
 				user.getBalance());
 	}
 
-	public User getCurrentUser() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		var            principal      = (User) authentication.getPrincipal();
-        if (getUserByEmail(principal.getEmail()).isEmpty()) {
-            throw new BuddyNotFoundException("Email " + principal.getEmail() + " does not match any Buddy.");
-        }
-		return getUserByEmail(principal.getEmail()).get();
+	public User getAuthenticatedUser() {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		if (getUserByEmail(username).isEmpty()) {
+			throw new BuddyNotFoundException("Email " + username + " does not match any Buddy.");
+		}
+		return getUserByEmail(username).get();
 	}
-
 
 }

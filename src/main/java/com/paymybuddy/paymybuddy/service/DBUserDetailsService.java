@@ -6,10 +6,12 @@ import com.paymybuddy.paymybuddy.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Optional;
 
+@Service
 public class DBUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

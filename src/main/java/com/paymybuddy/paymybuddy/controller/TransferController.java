@@ -35,7 +35,7 @@ public class TransferController {
 	@GetMapping
 	public String showTransferPage(Model model) {
 
-		User connectedUser = userService.getCurrentUser();
+		User connectedUser = userService.getAuthenticatedUser();
 		List<TransactionViewModel> userTransactions = transactionService.getUserTransactions(connectedUser.getId());
 		userTransactions.sort(Comparator.comparing(TransactionViewModel :: getDate).reversed());
 		List<UserViewModel> userConnections = connectionService.getUserConnections(connectedUser);
@@ -58,7 +58,7 @@ public class TransferController {
 	@PostMapping("/add-connection")
 	public String addConnection(String email, Model model, RedirectAttributes redirAttrs) {
 		try {
-			connectionService.createConnectionBetweenTwoUsers(userService.getCurrentUser(),
+			connectionService.createConnectionBetweenTwoUsers(userService.getAuthenticatedUser(),
 					email);
 			redirAttrs.addFlashAttribute("success", "Congratulations, you have a new Buddy!");
 			return "redirect:/transfer";
@@ -80,26 +80,27 @@ public class TransferController {
 		try {
 			model.addAttribute("page", "pay");
 			switch (action) {
-				case "pay":
+				case "pay" -> {
 					if (userService.getUserByEmail(transferForm.getPayeeEmail()).isEmpty()) {
 						throw new BuddyNotFoundException(
 								"Buddy with email (" + transferForm.getPayeeEmail() + ") does not exist.");
 					}
-					transactionService.createTransaction(userService.getCurrentUser(),
+					transactionService.createTransaction(userService.getAuthenticatedUser(),
 							userService.getUserByEmail(transferForm.getPayeeEmail()).get(),
 							transferForm.getDescription(),
 							transferForm.getAmount());
 					redirAttrs.addFlashAttribute("success",
 							"You successfully transferred " + transferForm.getAmount() + "€ to " + transferForm.getPayeeEmail());
-					break;
-				case "redirect":
+				}
+				case "redirect" -> {
 					model.addAttribute("transferForm", transferForm);
 					model.addAttribute("amountWithFee",
 							transactionService.calculateAmountWithFee(transferForm.getAmount()).get("amountWithFee")
 									.toString());
 					return "pay";
+				}
 			}
-		} catch (IllegalArgumentException | BuddyNotFoundException | AlreadyABuddyException e) {
+		} catch (Exception e) {
 			redirAttrs.addFlashAttribute("error", e.getMessage());
 		}
 		return "redirect:/transfer";

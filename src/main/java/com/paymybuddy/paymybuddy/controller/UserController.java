@@ -77,8 +77,8 @@ public class UserController {
      */
     @PutMapping("/deposit")
     public UserViewModel deposit(@RequestParam String amount) {
-        userService.deposit(userService.getCurrentUser(), amount);
-        return UserService.userToViewModel(userService.getCurrentUser());
+        userService.deposit(userService.getAuthenticatedUser(), amount);
+        return UserService.userToViewModel(userService.getAuthenticatedUser());
     }
 
     /**
@@ -89,8 +89,8 @@ public class UserController {
      */
     @PutMapping("/withdraw")
     public UserViewModel withdraw(@RequestParam String amount) {
-        userService.withdraw(userService.getCurrentUser(), amount);
-        return UserService.userToViewModel(userService.getCurrentUser());
+        userService.withdraw(userService.getAuthenticatedUser(), amount);
+        return UserService.userToViewModel(userService.getAuthenticatedUser());
     }
 
     /**
@@ -104,7 +104,7 @@ public class UserController {
     @PostMapping("/add-connection")
     @ResponseStatus(HttpStatus.CREATED)
     public ConnectionViewModel addConnection(@RequestParam String email) {
-        return ConnectionService.connectionToViewModel(connectionService.createConnectionBetweenTwoUsers(userService.getCurrentUser(),
+        return ConnectionService.connectionToViewModel(connectionService.createConnectionBetweenTwoUsers(userService.getAuthenticatedUser(),
                                                                                                          email));
     }
 
@@ -144,7 +144,7 @@ public class UserController {
             log.error(errorMessage);
             throw new BuddyNotFoundException(errorMessage);
         }
-        return TransactionService.transactionToViewModel(transactionService.createTransaction(userService.getCurrentUser(),
+        return TransactionService.transactionToViewModel(transactionService.createTransaction(userService.getAuthenticatedUser(),
                                                     userService.getUserByEmail(email).get(),
                                                     description,
                                                     amount));

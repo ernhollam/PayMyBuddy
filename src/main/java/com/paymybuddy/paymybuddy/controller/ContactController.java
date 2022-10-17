@@ -27,7 +27,7 @@ public class ContactController {
 	@GetMapping
 	public String showTransferPage(Model model) {
 
-		User connectedUser = userService.getCurrentUser();
+		User connectedUser = userService.getAuthenticatedUser();
 
 		model.addAttribute("user", connectedUser);
 		model.addAttribute("page", "contact");
