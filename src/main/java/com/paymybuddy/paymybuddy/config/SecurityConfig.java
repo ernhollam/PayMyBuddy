@@ -14,58 +14,52 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new DBUserDetailsService(userRepository);
-    }
+	@Bean
+	public UserDetailsService userDetailsService() {
+		return new DBUserDetailsService(userRepository);
+	}
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+	@Bean
+	public DaoAuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-    /*
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authenticationProvider(authenticationProvider())
-                    .authorizeRequests()
-                    .antMatchers("/login", "/signup")
-                    .permitAll()
-                    .anyRequest().authenticated()
+		authProvider.setUserDetailsService(userDetailsService());
+		authProvider.setPasswordEncoder(passwordEncoder());
+		return authProvider;
+	}
 
-                    .and().formLogin()
-                    .loginPage("/login")
-                    .usernameParameter("email")
-                    .passwordParameter("password")
-                    .defaultSuccessUrl("/home", true)
+	/*@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+		httpSecurity
+				.authorizeHttpRequests((requests) -> requests
+						.mvcMatchers("/login", "/signup").permitAll())
+						//.anyRequest().authenticated())
+				.formLogin((form) -> form
+						.loginPage("/login")
+						.usernameParameter("email")
+						.passwordParameter("password")
+						.defaultSuccessUrl("/home", true))
+				.rememberMe(rememberMeConfigurer -> rememberMeConfigurer.userDetailsService(userDetailsService()))
+				.logout((logout) -> logout
+						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+						.logoutSuccessUrl("/login?logout")
+						.invalidateHttpSession(true)
+						.deleteCookies("JSESSIONID"));
+		;
 
-                    .and()
-                    .rememberMe()
+		return httpSecurity.build();
+	}*/
 
-                    .and().logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    .logoutSuccessUrl("/login?logout")
-                    .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID")
-        ;
-
-        return httpSecurity.build();
-    }
-*/
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
-    }
+	@Bean
+	public WebSecurityCustomizer webSecurityCustomizer() {
+		return (web) -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
+	}
 }
