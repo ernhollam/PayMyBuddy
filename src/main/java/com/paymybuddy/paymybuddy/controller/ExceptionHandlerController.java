@@ -57,6 +57,13 @@ public class ExceptionHandlerController {
         return "Illegal argument value:\n" + emailAlreadyUsedException.getMessage();
     }
 
+    @ExceptionHandler(NotAuthenticatedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public String notAuthenticatedException(NotAuthenticatedException notAuthenticatedException) {
+        log.error("Not authenticated", notAuthenticatedException);
+        return "Unauthorized.\n" + notAuthenticatedException.getMessage();
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String returnMessage(Exception exception) {

@@ -28,7 +28,7 @@ public class HomeController {
 
     @GetMapping
     public String showHomePage(Model model) {
-        User connectedUser = userService.getCurrentUser();
+        User connectedUser = userService.getAuthenticatedUser();
 
         ConnectionViewModel mostRecentConnection = connectionService.getConnections()
                                                                     .stream()

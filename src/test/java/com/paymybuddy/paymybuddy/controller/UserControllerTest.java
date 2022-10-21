@@ -154,7 +154,7 @@ class UserControllerTest {
 
     @Test
     void deposit() throws Exception {
-        when(userService.getCurrentUser()).thenReturn(testUser);
+        when(userService.getAuthenticatedUser()).thenReturn(testUser);
         mockMvc.perform(put("/user/deposit")
                                 .param("amount", "50.00"))
                .andDo(print())
@@ -163,7 +163,7 @@ class UserControllerTest {
 
     @Test
     void withdraw() throws Exception {
-        when(userService.getCurrentUser()).thenReturn(testUser);
+        when(userService.getAuthenticatedUser()).thenReturn(testUser);
         mockMvc.perform(put("/user/withdraw")
                                 .param("amount", "50.00"))
                .andDo(print())
@@ -173,7 +173,7 @@ class UserControllerTest {
 
     @Test
     void addConnection() throws Exception {
-        when(userService.getCurrentUser()).thenReturn(testUser);
+        when(userService.getAuthenticatedUser()).thenReturn(testUser);
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser));
         when(connectionService.createConnectionBetweenTwoUsers(testUser, otherUser.getEmail())).thenReturn(connection);
         mockMvc.perform(post("/user/add-connection")
@@ -204,7 +204,7 @@ class UserControllerTest {
 
     @Test
     void payABuddy() throws Exception {
-        when(userService.getCurrentUser()).thenReturn(testUser);
+        when(userService.getAuthenticatedUser()).thenReturn(testUser);
         when(userService.getUserByEmail(otherUser.getEmail())).thenReturn(Optional.of(otherUser));
         when(connectionService.getUserConnections(testUser))
                 .thenReturn(List.of(UserService.userToViewModel(otherUser)));
@@ -220,7 +220,7 @@ class UserControllerTest {
 
     @Test
     void payABuddy_shouldThrow_exception() throws Exception {
-        when(userService.getCurrentUser()).thenReturn(testUser);
+        when(userService.getAuthenticatedUser()).thenReturn(testUser);
         when(userService.getUserByEmail(otherUser.getEmail())).thenReturn(Optional.empty());
         when(connectionService.getUserConnections(testUser)).thenReturn(List.of(UserService.userToViewModel(otherUser)));
 
