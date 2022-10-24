@@ -1,5 +1,6 @@
 package com.paymybuddy.paymybuddy.controller;
 
+import com.paymybuddy.paymybuddy.constants.Pagination;
 import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.User;
@@ -10,6 +11,8 @@ import com.paymybuddy.paymybuddy.service.ConnectionService;
 import com.paymybuddy.paymybuddy.service.TransactionService;
 import com.paymybuddy.paymybuddy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/transfer")
@@ -33,16 +38,35 @@ public class TransferController {
 	private ConnectionService  connectionService;
 
 	@GetMapping
-	public String showTransferPage(Model model) {
-
+	public String showTransferPage(Model model,
+			@RequestParam("page") Optional<Integer> page,
+			@RequestParam("size") Optional<Integer> size) {
+		// Connected user
 		User connectedUser = userService.getAuthenticatedUser();
-		List<TransactionViewModel> userTransactions = transactionService.getUserTransactions(connectedUser.getId());
-		userTransactions.sort(Comparator.comparing(TransactionViewModel :: getDate).reversed());
+
+		// Transaction pagination
+		int currentPage = page.orElse(Pagination.DEFAULT_PAGE);
+		int pageSize    = size.orElse(Pagination.DEFAULT_SIZE);
+
+		Page<TransactionViewModel> transactionPage = transactionService.getPaginatedUserTransactions(
+				PageRequest.of(currentPage - 1, pageSize), connectedUser.getId());
+
+		model.addAttribute("transactionPage", transactionPage);
+		model.addAttribute("totalTransactionItems", transactionPage.getTotalElements());
+
+		int totalTransactionPages = transactionPage.getTotalPages();
+		if (totalTransactionPages > 0) {
+			List<Integer> transactionPageNumbers = IntStream.rangeClosed(1, totalTransactionPages)
+					.boxed()
+					.collect(Collectors.toList());
+			model.addAttribute("transactionPageNumbers", transactionPageNumbers);
+		}
+		model.addAttribute("totalTransactionPages", totalTransactionPages);
+
 		List<UserViewModel> userConnections = connectionService.getUserConnections(connectedUser);
 
 		model.addAttribute("user", connectedUser);
 		model.addAttribute("connections", userConnections);
-		model.addAttribute("transactions", userTransactions);
 		model.addAttribute("page", "transfer");
 		model.addAttribute("transferForm", new TransferViewModel());
 

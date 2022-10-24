@@ -1,6 +1,7 @@
 package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.constants.Fee;
+import com.paymybuddy.paymybuddy.constants.Pagination;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.InsufficientBalanceException;
 import com.paymybuddy.paymybuddy.exceptions.InvalidAmountException;
@@ -11,6 +12,7 @@ import com.paymybuddy.paymybuddy.model.viewmodel.TransactionViewModel;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -96,7 +98,7 @@ public class TransactionService {
 		HashMap<String, BigDecimal> amountAndFee = new HashMap<>();
 		BigDecimal bdAmount = new BigDecimal(Double.toString(amount))
 				.setScale(Fee.SCALE, RoundingMode.HALF_UP);
-		BigDecimal bdFee = new BigDecimal(Double.toString(amount*Fee.TRANSACTION_FEE))
+		BigDecimal bdFee = new BigDecimal(Double.toString(amount * Fee.TRANSACTION_FEE))
 				.setScale(Fee.SCALE, RoundingMode.HALF_UP);
 		amountAndFee.put("amount", bdAmount);
 		amountAndFee.put("fee", bdFee);
@@ -145,6 +147,35 @@ public class TransactionService {
 		transactionsWhereUserIsInvolved.forEach(transaction -> transactions.add(transactionToViewModel(transaction)));
 		log.info("Transactions with " + user.getEmail() + ":\n" + transactions);
 		return transactions;
+	}
+
+	/**
+	 * Returns a paginated list of user's transactions.
+	 *
+	 * @param pageable Pageable object.
+	 * @param id       Id of connected user.
+	 * @return a paginated list of transactions.
+	 */
+	public Page<TransactionViewModel> getPaginatedUserTransactions(Pageable pageable, Integer id) {
+		// Get raw list of transactions
+		List<TransactionViewModel> transactions = getUserTransactions(id);
+
+		// Configure pagination parameters
+		int                        pageSize    = Pagination.DEFAULT_SIZE;
+		int                        currentPage = pageable.getPageNumber();
+		int                        startItem   = currentPage * pageSize;
+		List<TransactionViewModel> list;
+
+		if (transactions.size() < startItem) {
+			list = Collections.emptyList();
+		} else {
+			int toIndex = Math.min(startItem + pageSize, transactions.size());
+			list = transactions.subList(startItem, toIndex);
+		}
+		// Show most recent transactions first
+		return new PageImpl<>(list,
+				PageRequest.of(currentPage, pageSize, Sort.by("date").descending()),
+				transactions.size());
 	}
 
 	public static TransactionViewModel transactionToViewModel(Transaction transaction) {
