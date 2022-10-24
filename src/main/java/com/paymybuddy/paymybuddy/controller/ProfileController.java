@@ -37,11 +37,11 @@ public class ProfileController {
         // Connection pagination
         int currentPage = page == null ? Pagination.DEFAULT_PAGE : page;
         int pageSize    = size == null ? Pagination.DEFAULT_SIZE : size;
-        Page<?> connectionPage =
+        Page<?> pagedList =
                 connectionService.getPaginatedUserConnections(PageRequest.of(currentPage - 1, pageSize), connectedUser);
 
-        model.addAttribute("connectionPage", connectionPage);
-        model.addAttribute("totalConnectionItems", connectionPage.getTotalElements());
+        model.addAttribute("pagedList", pagedList);
+        model.addAttribute("totalConnectionItems", pagedList.getTotalElements());
 
 
         model.addAttribute("user", connectedUser);

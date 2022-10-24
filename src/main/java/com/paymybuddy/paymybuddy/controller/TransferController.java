@@ -44,11 +44,11 @@ public class TransferController {
         int currentPage = page == null ? Pagination.DEFAULT_PAGE : page;
         int pageSize    = size == null ? Pagination.DEFAULT_SIZE : size;
 
-        Page<?> transactionPage = transactionService.getPaginatedUserTransactions(
+        Page<?> pagedList = transactionService.getPaginatedUserTransactions(
                 PageRequest.of(currentPage - 1, pageSize), connectedUser.getId());
 
-        model.addAttribute("transactionPage", transactionPage);
-        model.addAttribute("totalTransactionItems", transactionPage.getTotalElements());
+        model.addAttribute("pagedList", pagedList);
+        model.addAttribute("totalTransactionItems", pagedList.getTotalElements());
 
         List<UserViewModel> userConnections = connectionService.getUserConnections(connectedUser);
 
