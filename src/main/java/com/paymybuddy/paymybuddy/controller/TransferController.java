@@ -4,7 +4,6 @@ import com.paymybuddy.paymybuddy.constants.Pagination;
 import com.paymybuddy.paymybuddy.exceptions.AlreadyABuddyException;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.model.User;
-import com.paymybuddy.paymybuddy.model.viewmodel.TransactionViewModel;
 import com.paymybuddy.paymybuddy.model.viewmodel.TransferViewModel;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
 import com.paymybuddy.paymybuddy.service.ConnectionService;
@@ -22,111 +21,99 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/transfer")
 public class TransferController {
 
-	@Autowired
-	private UserService        userService;
-	@Autowired
-	private TransactionService transactionService;
-	@Autowired
-	private ConnectionService  connectionService;
+    @Autowired
+    private UserService        userService;
+    @Autowired
+    private TransactionService transactionService;
+    @Autowired
+    private ConnectionService  connectionService;
 
-	@GetMapping
-	public String showTransferPage(Model model,
-			@RequestParam("page") Optional<Integer> page,
-			@RequestParam("size") Optional<Integer> size) {
-		// Connected user
-		User connectedUser = userService.getAuthenticatedUser();
+    @GetMapping
+    public String showTransferPage(Model model,
+                                   @RequestParam(value = "page", required = false) Integer page,
+                                   @RequestParam(value = "size", required = false) Integer size) {
+        // Connected user
+        User connectedUser = userService.getAuthenticatedUser();
 
-		// Transaction pagination
-		int currentPage = page.orElse(Pagination.DEFAULT_PAGE);
-		int pageSize    = size.orElse(Pagination.DEFAULT_SIZE);
+        // Transaction pagination
+        int currentPage = page == null ? Pagination.DEFAULT_PAGE : page;
+        int pageSize    = size == null ? Pagination.DEFAULT_SIZE : size;
 
-		Page<TransactionViewModel> transactionPage = transactionService.getPaginatedUserTransactions(
-				PageRequest.of(currentPage - 1, pageSize), connectedUser.getId());
+        Page<?> transactionPage = transactionService.getPaginatedUserTransactions(
+                PageRequest.of(currentPage - 1, pageSize), connectedUser.getId());
 
-		model.addAttribute("transactionPage", transactionPage);
-		model.addAttribute("totalTransactionItems", transactionPage.getTotalElements());
+        model.addAttribute("transactionPage", transactionPage);
+        model.addAttribute("totalTransactionItems", transactionPage.getTotalElements());
 
-		int totalTransactionPages = transactionPage.getTotalPages();
-		if (totalTransactionPages > 0) {
-			List<Integer> transactionPageNumbers = IntStream.rangeClosed(1, totalTransactionPages)
-					.boxed()
-					.collect(Collectors.toList());
-			model.addAttribute("transactionPageNumbers", transactionPageNumbers);
-		}
-		model.addAttribute("totalTransactionPages", totalTransactionPages);
+        List<UserViewModel> userConnections = connectionService.getUserConnections(connectedUser);
 
-		List<UserViewModel> userConnections = connectionService.getUserConnections(connectedUser);
+        model.addAttribute("user", connectedUser);
+        model.addAttribute("connections", userConnections);
+        model.addAttribute("page", "transfer");
+        model.addAttribute("transferForm", new TransferViewModel());
 
-		model.addAttribute("user", connectedUser);
-		model.addAttribute("connections", userConnections);
-		model.addAttribute("page", "transfer");
-		model.addAttribute("transferForm", new TransferViewModel());
+        return "transfer";
+    }
 
-		return "transfer";
-	}
+    @GetMapping("/add-connection")
+    public String showAddConnectionPage(Model model) {
+        model.addAttribute("page", "add-connection");
+        return "add-connection";
+    }
 
-	@GetMapping("/add-connection")
-	public String showAddConnectionPage(Model model) {
-		model.addAttribute("page", "add-connection");
-		return "add-connection";
-	}
+    @PostMapping("/add-connection")
+    public String addConnection(String email, Model model, RedirectAttributes redirAttrs) {
+        try {
+            connectionService.createConnectionBetweenTwoUsers(userService.getAuthenticatedUser(),
+                                                              email);
+            redirAttrs.addFlashAttribute("success", "Congratulations, you have a new Buddy!");
+            return "redirect:/transfer";
+        } catch (IllegalArgumentException | BuddyNotFoundException | AlreadyABuddyException e) {
+            redirAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/transfer";
+        }
+    }
 
-	@PostMapping("/add-connection")
-	public String addConnection(String email, Model model, RedirectAttributes redirAttrs) {
-		try {
-			connectionService.createConnectionBetweenTwoUsers(userService.getAuthenticatedUser(),
-					email);
-			redirAttrs.addFlashAttribute("success", "Congratulations, you have a new Buddy!");
-			return "redirect:/transfer";
-		} catch (IllegalArgumentException | BuddyNotFoundException | AlreadyABuddyException e) {
-			redirAttrs.addFlashAttribute("error", e.getMessage());
-			return "redirect:/transfer";
-		}
-	}
+    @GetMapping("/pay")
+    public String showPayPage(TransferViewModel transferForm, Model model) {
+        model.addAttribute("page", "pay");
+        return "pay";
+    }
 
-	@GetMapping("/pay")
-	public String showPayPage(TransferViewModel transferForm, Model model) {
-		model.addAttribute("page", "pay");
-		return "pay";
-	}
-
-	@PostMapping("/pay")
-	public String pay(@RequestParam String action, TransferViewModel transferForm, Model model,
-			RedirectAttributes redirAttrs) {
-		try {
-			model.addAttribute("page", "pay");
-			switch (action) {
-				case "pay" -> {
-					if (userService.getUserByEmail(transferForm.getPayeeEmail()).isEmpty()) {
-						throw new BuddyNotFoundException(
-								"Buddy with email (" + transferForm.getPayeeEmail() + ") does not exist.");
-					}
-					transactionService.createTransaction(userService.getAuthenticatedUser(),
-							userService.getUserByEmail(transferForm.getPayeeEmail()).get(),
-							transferForm.getDescription(),
-							transferForm.getAmount());
-					redirAttrs.addFlashAttribute("success",
-							"You successfully transferred " + transferForm.getAmount() + "€ to " + transferForm.getPayeeEmail());
-				}
-				case "redirect" -> {
-					model.addAttribute("transferForm", transferForm);
-					model.addAttribute("amountWithFee",
-							transactionService.calculateAmountWithFee(transferForm.getAmount()).get("amountWithFee")
-									.toString());
-					return "pay";
-				}
-			}
-		} catch (Exception e) {
-			redirAttrs.addFlashAttribute("error", e.getMessage());
-		}
-		return "redirect:/transfer";
-	}
+    @PostMapping("/pay")
+    public String pay(@RequestParam String action, TransferViewModel transferForm, Model model,
+                      RedirectAttributes redirAttrs) {
+        try {
+            model.addAttribute("page", "pay");
+            switch (action) {
+                case "pay" -> {
+                    if (userService.getUserByEmail(transferForm.getPayeeEmail()).isEmpty()) {
+                        throw new BuddyNotFoundException(
+                                "Buddy with email (" + transferForm.getPayeeEmail() + ") does not exist.");
+                    }
+                    transactionService.createTransaction(userService.getAuthenticatedUser(),
+                                                         userService.getUserByEmail(transferForm.getPayeeEmail()).get(),
+                                                         transferForm.getDescription(),
+                                                         transferForm.getAmount());
+                    redirAttrs.addFlashAttribute("success",
+                                                 "You successfully transferred " + transferForm.getAmount() + "€ to " + transferForm.getPayeeEmail());
+                }
+                case "redirect" -> {
+                    model.addAttribute("transferForm", transferForm);
+                    model.addAttribute("amountWithFee",
+                                       transactionService.calculateAmountWithFee(transferForm.getAmount()).get("amountWithFee")
+                                                         .toString());
+                    return "pay";
+                }
+            }
+        } catch (Exception e) {
+            redirAttrs.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/transfer";
+    }
 }

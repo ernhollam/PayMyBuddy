@@ -104,56 +104,41 @@
         Total transactions: [[${totalTransactionItems}]]
     </div>
     <nav aria-label="Transactions navigation"
-         th:if="${transactionPage.totalPages > 0}"
-         class="table-pagination">
-        <ul class="pagination pagination-centered">
-            <li class="page-item" th:class="${transactionPage.number eq 0} ? ' disabled' : ''">
-                <a class="page-link" th:if="${not transactionPage.first}" th:href="@{${'/transfer'}(page=${transactionPage.number},size=${transactionPage.size})}">&laquo;</a>
-            </li>
-
-            <li class="page-item" th:each="currentPage : ${#numbers.sequence(0, transactionPage.totalPages - 1)}" th:class="${transactionPage.number eq currentPage}? ' active' : ''">
-                <a class="page-link" th:if="${transactionPage.number  eq currentPage}" href="javascript:void(0);">
-                    <span th:text="${currentPage + 1}"></span>
-                </a>
-                <a class="page-link" th:if="${not (transactionPage.number  eq currentPage)}" th:href="@{${'/transfer'}(page=${currentPage+1},size=${transactionPage.size})}">
-                    <span th:text="${currentPage + 1}"></span>
-                </a>
-
-            </li>
-            <li class="page-item" th:classappend="${transactionPage.number + 1 ge transactionPage.totalPages} ? ' disabled' : ''">
-                <a class="page-link" th:if="${not transactionPage.last}" th:href="@{${'/transfer'}(page=${transactionPage.number+2},size=${transactionPage.size})}">&raquo;</a>
-            </li>
-        </ul>
-    </nav>
-    <!--<nav aria-label="Transactions navigation"
          th:if="${transactionPage.totalPages > 0}">
-        <ul class="pagination justify-content-center mx-auto"
-            th:each="pageNumber : ${transactionPageNumbers}">
-            <li th:if="${pageNumber > 1}"
-                th:disabled="pageNumber == 1" class="page-item">
+        <ul class="pagination justify-content-center mx-auto">
+            <li class="page-item"
+                th:classappend="${transactionPage.number == 0} ? ' disabled' : ''">
                 <a class="page-link" aria-label="Previous"
-                   th:href="@{/transfer(size=${transactionPage.size}, page=${pageNumber - 1})}">
+                   th:if="${!transactionPage.first}"
+                   th:href="@{${'/transfer'}(page=${transactionPage.number},size=${transactionPage.size})}">
                     <span aria-hidden="true">&laquo;</span>
                     <span class="sr-only">Previous</span>
                 </a>
             </li>
-            <li class="page-item">
+            <li class="page-item"
+                th:each="currentPage : ${#numbers.sequence(0, transactionPage.totalPages - 1)}"
+                th:classappend="${transactionPage.number == currentPage} ? ' active' : ''">
                 <a class="page-link"
-                   th:classappend=" ${pageNumber == transactionPage.number + 1} ? ' active'"
-                   th:href="@{/transfer(size=${transactionPage.size}, page=${pageNumber})}"
-                   th:text=${pageNumber}>1</a>
+                   th:if="${transactionPage.number == currentPage}" href="javascript:void(0);">
+                    <span th:text="${currentPage + 1}">1</span>
+                </a>
+                <a class="page-link"
+                   th:if="${not (transactionPage.number  == currentPage)}"
+                   th:href="@{${'/transfer'}(page=${currentPage+1},size=${transactionPage.size})}">
+                    <span th:text="${currentPage + 1}">1</span>
+                </a>
             </li>
-            <li th:if="${pageNumber < totalTransactionPages}"
-                th:disabled="${pageNumber == totalTransactionPages}"
-                class="page-item">
+            <li class="page-item"
+                th:classappend="${transactionPage.number + 1 >= transactionPage.totalPages} ? ' disabled' : ''">
                 <a class="page-link" aria-label="Next"
-                   th:href="@{/transfer(size=${transactionPage.size}, page=${pageNumber + 1})}">
+                   th:if="${!transactionPage.last}"
+                   th:href="@{${'/transfer'}(page=${transactionPage.number+2},size=${transactionPage.size})}">
                     <span aria-hidden="true">&raquo;</span>
                     <span class="sr-only">Next</span>
                 </a>
             </li>
         </ul>
-    </nav>-->
+    </nav>
 </main>
 
 <footer>

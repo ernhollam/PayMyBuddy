@@ -10,6 +10,8 @@ import com.paymybuddy.paymybuddy.repository.ConnectionRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,6 +27,9 @@ public class ConnectionService {
 
 	@Autowired
 	ConnectionRepository connectionRepository;
+
+	@Autowired
+	PaginationService paginationService;
 
 	@Autowired
 	UserRepository userRepository;
@@ -57,6 +62,22 @@ public class ConnectionService {
 		log.info("Connections for " + user.getEmail() + ":\n" + connections);
 		return connections;
 	}
+
+
+	/**
+	 * Returns a paginated list of user's connections.
+	 *
+	 * @param pageable Pageable object.
+	 * @param user       Connected user.
+	 * @return a paginated list of connections.
+	 */
+	public Page<?> getPaginatedUserConnections(Pageable pageable, User user) {
+		// Get raw list of connections
+		List<UserViewModel> connections = getUserConnections(user);
+		return paginationService.getPaginatedList(pageable, connections);
+	}
+
+
 
 	/**
 	 * Creates a connection between two users and saves it to database.

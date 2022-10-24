@@ -1,7 +1,6 @@
 package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.constants.Fee;
-import com.paymybuddy.paymybuddy.constants.Pagination;
 import com.paymybuddy.paymybuddy.exceptions.BuddyNotFoundException;
 import com.paymybuddy.paymybuddy.exceptions.InsufficientBalanceException;
 import com.paymybuddy.paymybuddy.exceptions.InvalidAmountException;
@@ -12,7 +11,8 @@ import com.paymybuddy.paymybuddy.model.viewmodel.TransactionViewModel;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -31,6 +31,8 @@ public class TransactionService {
 	ConnectionService     connectionService;
 	@Autowired
 	UserService           userService;
+	@Autowired
+	PaginationService paginationService;
 	@Autowired
 	Clock                 clock;
 
@@ -156,26 +158,10 @@ public class TransactionService {
 	 * @param id       Id of connected user.
 	 * @return a paginated list of transactions.
 	 */
-	public Page<TransactionViewModel> getPaginatedUserTransactions(Pageable pageable, Integer id) {
+	public Page<?> getPaginatedUserTransactions(Pageable pageable, Integer id) {
 		// Get raw list of transactions
 		List<TransactionViewModel> transactions = getUserTransactions(id);
-
-		// Configure pagination parameters
-		int                        pageSize    = Pagination.DEFAULT_SIZE;
-		int                        currentPage = pageable.getPageNumber();
-		int                        startItem   = currentPage * pageSize;
-		List<TransactionViewModel> list;
-
-		if (transactions.size() < startItem) {
-			list = Collections.emptyList();
-		} else {
-			int toIndex = Math.min(startItem + pageSize, transactions.size());
-			list = transactions.subList(startItem, toIndex);
-		}
-		// Show most recent transactions first
-		return new PageImpl<>(list,
-				PageRequest.of(currentPage, pageSize, Sort.by("date").descending()),
-				transactions.size());
+		return paginationService.getPaginatedList(pageable, transactions);
 	}
 
 	public static TransactionViewModel transactionToViewModel(Transaction transaction) {
