@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -39,14 +38,14 @@ public class TransferController {
 
 	@GetMapping
 	public String showTransferPage(Model model,
-			@RequestParam("page") Optional<Integer> page,
-			@RequestParam("size") Optional<Integer> size) {
+			@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "size", required = false) Integer size) {
 		// Connected user
 		User connectedUser = userService.getAuthenticatedUser();
 
 		// Transaction pagination
-		int currentPage = page.orElse(Pagination.DEFAULT_PAGE);
-		int pageSize    = size.orElse(Pagination.DEFAULT_SIZE);
+		int currentPage = page == null ? Pagination.DEFAULT_PAGE : page;
+		int pageSize    = size == null ? Pagination.DEFAULT_SIZE : size;
 
 		Page<TransactionViewModel> transactionPage = transactionService.getPaginatedUserTransactions(
 				PageRequest.of(currentPage - 1, pageSize), connectedUser.getId());
