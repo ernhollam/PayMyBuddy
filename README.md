@@ -1,7 +1,7 @@
 # PayMyBuddy
 6th project from OpenClassrooms' Backend developer curriculum, an app for money transfer between friends.
 
-# Summary
+## Summary
 
 You are looking for an app that makes money transfer between friends? Say no more, you stumbled on the right application.
 
@@ -28,11 +28,11 @@ Open your favorite IDE, clone, and run `PayMyBuddyApplication.java` to launch th
 
 ## DAL layer
 ### UML diagram
-![UML diagramm](src/main/resources/readme/uml.png)
+![UML diagram](src/main/resources/readme/uml.png)
 ### Physical data model
 ![](src/main/resources/readme/mdp.png)
 ### Data base
-To create the data base, open your favorite SGBD and run the script under `src/main/resources/database/create.sql`.
+To create the database, open your favorite SGBD and run the script under `src/main/resources/database/create.sql`.
 
 Once your database is created, you can populate it by running `src/main/resources/database/data.sql` or by running the app, then creating your own users to test the app.
 
