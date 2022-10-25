@@ -11,6 +11,8 @@ import com.paymybuddy.paymybuddy.model.viewmodel.TransactionViewModel;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -29,6 +31,8 @@ public class TransactionService {
 	ConnectionService     connectionService;
 	@Autowired
 	UserService           userService;
+	@Autowired
+	PaginationService paginationService;
 	@Autowired
 	Clock                 clock;
 
@@ -96,7 +100,7 @@ public class TransactionService {
 		HashMap<String, BigDecimal> amountAndFee = new HashMap<>();
 		BigDecimal bdAmount = new BigDecimal(Double.toString(amount))
 				.setScale(Fee.SCALE, RoundingMode.HALF_UP);
-		BigDecimal bdFee = new BigDecimal(Double.toString(amount*Fee.TRANSACTION_FEE))
+		BigDecimal bdFee = new BigDecimal(Double.toString(amount * Fee.TRANSACTION_FEE))
 				.setScale(Fee.SCALE, RoundingMode.HALF_UP);
 		amountAndFee.put("amount", bdAmount);
 		amountAndFee.put("fee", bdFee);
@@ -145,6 +149,19 @@ public class TransactionService {
 		transactionsWhereUserIsInvolved.forEach(transaction -> transactions.add(transactionToViewModel(transaction)));
 		log.info("Transactions with " + user.getEmail() + ":\n" + transactions);
 		return transactions;
+	}
+
+	/**
+	 * Returns a paginated list of user's transactions.
+	 *
+	 * @param pageable Pageable object.
+	 * @param id       Id of connected user.
+	 * @return a paginated list of transactions.
+	 */
+	public Page<?> getPaginatedUserTransactions(Pageable pageable, Integer id) {
+		// Get raw list of transactions
+		List<TransactionViewModel> transactions = getUserTransactions(id);
+		return paginationService.getPaginatedList(pageable, transactions);
 	}
 
 	public static TransactionViewModel transactionToViewModel(Transaction transaction) {

@@ -49,12 +49,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:if="${connections == null}">
+                <tr th:if="${pagedList.totalElements == 0}">
                     <td></td>
                     <td class="font-italic">No connections.</td>
                     <td></td>
                 </tr>
-                <tr th:each="connection : ${connections}">
+                <tr th:each="connection : ${pagedList.content}">
                     <td th:text="${connection.firstname}"></td>
                     <td th:text="${connection.lastname}"></td>
                     <td th:text="${connection.email}"></td>
@@ -63,6 +63,10 @@
             </table>
         </div>
     </div>
+    <div class="form-text text-muted mx-auto col-4 text-small">
+        Total connections: [[${pagedList.totalElements}]]
+    </div>
+    <nav id="connection-pagination" th:insert="fragments/pagination :: nav"></nav>
 </main>
 
 <footer>

@@ -69,7 +69,8 @@
                 </div>
                 <div class="col-auto m-4">
                     <button class="btn btn-success" href="/pay" th:href="@{/transfer/pay}" role="button"
-                    name="action" value="redirect">Pay</button>
+                            name="action" value="redirect">Pay
+                    </button>
                 </div>
             </form>
         </div>
@@ -86,12 +87,12 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:if="${transactions == null}">
+            <tr th:if="${totalTransactionItems == 0}">
                 <td></td>
                 <td class="font-italic">No transactions.</td>
                 <td></td>
             </tr>
-            <tr th:each="transaction : ${transactions}">
+            <tr th:each="transaction : ${pagedList.content}">
                 <td th:text="((${transaction.issuer.getEmail()} == ${user.getEmail()}) ? ${transaction.payee.getFirstname()} : ${transaction.issuer.getFirstname()})">Haley</td>
                 <td th:text="${transaction.description}">Restaurant bill share</td>
                 <td th:text="${#strings.replace(#numbers.formatCurrency(transaction.amount), ',00', '')}">10.00 €</td>
@@ -99,25 +100,10 @@
             </tbody>
         </table>
     </div>
-    <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center mx-auto">
-            <li class="page-item">
-                <a class="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                    <span class="sr-only">Previous</span>
-                </a>
-            </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                    <span class="sr-only">Next</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <div class="form-text text-muted mx-auto col-4 text-small">
+        Total transactions: [[${totalTransactionItems}]]
+    </div>
+    <nav id="transaction-pagination" th:insert="fragments/pagination :: nav"></nav>
 </main>
 
 <footer>
