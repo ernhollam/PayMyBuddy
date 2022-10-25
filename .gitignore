@@ -33,4 +33,5 @@ build/
 .vscode/
 
 #externalize configuration
-/src/config/application.properties
+/src/test/resources/application_test.properties
+/src/test/resources/application.properties

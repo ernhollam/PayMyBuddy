@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -19,21 +18,15 @@ public class Connection {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "connection_id")
-	private int connectionId;
+	private Integer id;
 
-	/*@OneToOne(
-			cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-			orphanRemoval = true
-	)
-	@JoinColumn(name = "fk_user_one_id")
-	private int userOneId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fk_initializer_id")
+	private User initializer;
 
-	@OneToOne(
-			cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-			orphanRemoval = true
-	)
-	@JoinColumn(name = "fk_user_two_id")
-	private int userTwoId;*/
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fk_receiver_id")
+	private User receiver;
 
-	private LocalDateTime date;
+	private LocalDateTime startingDate;
 }
