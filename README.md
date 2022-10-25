@@ -21,7 +21,7 @@ With PayMyBuddy, you will be able to:
 ### Running PayMyBuddy
 Clone the source repository using Git:
 
-```git clone https://github.com/ernhollam/PayMyBuddy/tree/develop.git```
+```git clone https://github.com/ernhollam/PayMyBuddy.git```
 
 Open your favorite IDE, clone, and run `PayMyBuddyApplication.java` to launch the application.
 
@@ -29,12 +29,14 @@ Open your favorite IDE, clone, and run `PayMyBuddyApplication.java` to launch th
 ## DAL layer
 ### UML diagram
 ![UML diagram](src/main/resources/readme/uml.png)
-### Physical data model
-![](src/main/resources/readme/mdp.png)
-### Data base
-To create the database, open your favorite SGBD and run the script under `src/main/resources/database/create.sql`.
 
-Once your database is created, you can populate it by running `src/main/resources/database/data.sql` or by running the app, then creating your own users to test the app.
+### Physical data model
+![Physical data model](src/main/resources/readme/mdp.png)
+
+### Database
+To create the database, open your favorite SGBD and run the script under [src/main/resources/database/create.sql](src/main/resources/database/create.sql).
+
+Once your database is created, you can populate it by running [src/main/resources/database/data.sql](src/main/resources/database/data.sql) or by running the app, then creating your own users to test the app.
 
 
 ## Glimpses
