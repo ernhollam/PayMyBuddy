@@ -1,7 +1,7 @@
 # PayMyBuddy
 6th project from OpenClassrooms' Backend developer curriculum, an app for money transfer between friends.
 
-# Summary
+## Summary
 
 You are looking for an app that makes money transfer between friends? Say no more, you stumbled on the right application.
 
