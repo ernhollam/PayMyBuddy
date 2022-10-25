@@ -17,6 +17,8 @@ With PayMyBuddy, you will be able to:
 - SpringBoot 2.7.1
 - Spring Security 5.7.2
 - Maven 3.8.4
+- Thymeleaf
+- Bootstrap v.4.3.1
 
 ### Running PayMyBuddy
 Clone the source repository using Git:
