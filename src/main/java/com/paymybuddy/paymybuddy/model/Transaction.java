@@ -22,10 +22,12 @@ public class Transaction {
 	private Integer id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@MapsId
 	@JoinColumn(name = "fk_issuer_id")
 	private User issuer;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@MapsId
 	@JoinColumn(name = "fk_payee_id")
 	private User payee;
 
