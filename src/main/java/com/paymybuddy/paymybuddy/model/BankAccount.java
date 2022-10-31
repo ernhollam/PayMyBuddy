@@ -25,6 +25,13 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BankAccount {
+    public BankAccount(User user, String bankName, String iban, BigDecimal balance) {
+        this.user = user;
+        this.bankName = bankName;
+        this.iban = iban;
+        this.balance = balance;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")

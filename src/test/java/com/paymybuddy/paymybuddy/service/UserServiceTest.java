@@ -1,8 +1,10 @@
 package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.exceptions.EmailAlreadyUsedException;
+import com.paymybuddy.paymybuddy.model.BankAccount;
 import com.paymybuddy.paymybuddy.model.User;
 import com.paymybuddy.paymybuddy.model.viewmodel.UserViewModel;
+import com.paymybuddy.paymybuddy.repository.BankAccountRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,9 +41,12 @@ class UserServiceTest {
     UserRepository        userRepository;
     @MockBean
     BCryptPasswordEncoder passwordEncoder;
+    @MockBean
+    BankAccountRepository bankAccountRepository;
 
     private User testUser;
     private User otherUser;
+    private BankAccount bankAccount;
 
     @BeforeEach
     public void initUsers() {
@@ -60,6 +65,8 @@ class UserServiceTest {
         otherUser.setPassword("HowUDoin");
         otherUser.setEmail("otheremail@mail.com");
         otherUser.setBalance(new BigDecimal("09.56"));
+
+        bankAccount = new BankAccount(testUser, "Test Bank", "FR7630001007941234567890185", new BigDecimal("12648.62"));
 
     }
 
@@ -121,8 +128,52 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Id should not be null when calling getUserById")
+    void getUserById_whenIDIsNull_shouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> userService.getUserById(null));
+    }
+
+    @Test
+    @DisplayName("Email should not be null when calling getUserByEmail")
+    void getUserByEmail_whenEmailIsNull_shouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> userService.getUserByEmail(null));
+    }
+
+    @Test
+    @DisplayName("User should not be null when calling deleteUser")
+    void deleteUser_whenUserIsNull_shouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> userService.deleteUser(null));
+    }
+
+    @Test
+    @DisplayName("User should not be null when calling getUserBankAccount")
+    void getUserBankAccount_whenUserIsNull_shouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> userService.getUserBankAccount(null));
+    }
+
+    @Test
+    @DisplayName("User should not be null when calling deposit")
+    void deposit_whenUserIsNull_shouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> userService.deposit(null, "30"));
+    }
+
+    @Test
+    @DisplayName("User should own a bank account to make a deposit")
+    void deposit_whenBankAccountDoesNotExist_shouldThrowException() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class,
+                     () -> userService.deposit(null, "30"));
+    }
+
+    @Test
     @DisplayName("Deposit should add amount to user's balance")
-    void deposit_shouldAdd_amount() {
+    void deposit_shouldAdd_amountFrom_BuddyAccount() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.of(bankAccount));
         String amount = "490.44";
         userService.deposit(testUser, amount);
         verify(userRepository, times(1)).save(testUser);
@@ -130,16 +181,35 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Deposit should subtract amount to user's bank account")
+    void deposit_shouldSub_amountFrom_BankAccount() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.of(bankAccount));
+        String amount = "648.62";
+        userService.deposit(testUser, amount);
+        verify(userRepository, times(1)).save(testUser);
+        assertThat(bankAccount.getBalance()).isEqualTo(new BigDecimal("12000.00"));
+    }
+
+    @Test
     @DisplayName("Deposit should replace any \"-\" in amount ")
     void deposit_shouldReplaceSign() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.of(bankAccount));
         String amount = "-490.44";
         userService.deposit(testUser, amount);
         assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("3000.00"));
     }
 
     @Test
+    @DisplayName("User should not be null when calling withdraw")
+    void withdraw_whenUserIsNull_shouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> userService.withdraw(null, "30"));
+    }
+
+    @Test
     @DisplayName("Withdrawal should withdraw money from user's account")
     void withdraw_shouldWithdraw_amount() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.of(bankAccount));
         String amount = "509.56";
         userService.withdraw(testUser, amount);
         verify(userRepository, times(1)).save(testUser);
@@ -149,9 +219,28 @@ class UserServiceTest {
     @Test
     @DisplayName("Withdrawal should replace any \"-\" in amount ")
     void withdraw_shouldReplaceSign() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.of(bankAccount));
         String amount = "-509.56";
         userService.withdraw(testUser, amount);
         assertThat(testUser.getBalance()).isEqualTo(new BigDecimal("2000.00"));
+    }
+
+    @Test
+    @DisplayName("User should own a bank account to make a withdrawal")
+    void withdraw_whenBankAccountDoesNotExist_shouldThrowException() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class,
+                     () -> userService.withdraw(null, "30"));
+    }
+
+    @Test
+    @DisplayName("Withdrawal should add amount to user's bank account")
+    void withdraw_shouldAdd_amountTo_BankAccount() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.of(bankAccount));
+        String amount = "351.38";
+        userService.withdraw(testUser, amount);
+        verify(userRepository, times(1)).save(testUser);
+        assertThat(bankAccount.getBalance()).isEqualTo(new BigDecimal("13000.00"));
     }
 
     @Test
@@ -175,5 +264,21 @@ class UserServiceTest {
         assertThat(result.getBalance()).isEqualTo(testUser.getBalance());
         assertThat(result.getFirstname()).isEqualTo(testUser.getFirstName());
         assertThat(result.getLastname()).isEqualTo(testUser.getLastName());
+    }
+
+    @Test
+    @DisplayName("A bank account must be returned if the user has one")
+    void getUserBankAccount_shouldReturn_aBankAccount() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.of(bankAccount));
+        Optional<BankAccount> result = userService.getUserBankAccount(testUser);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    @DisplayName("No bank account must be returned if the user does not have one")
+    void getUserBankAccount_shouldReturn_emptyOptional() {
+        when(bankAccountRepository.findByUser(testUser)).thenReturn(Optional.empty());
+        Optional<BankAccount> result = userService.getUserBankAccount(testUser);
+        assertTrue(result.isEmpty());
     }
 }

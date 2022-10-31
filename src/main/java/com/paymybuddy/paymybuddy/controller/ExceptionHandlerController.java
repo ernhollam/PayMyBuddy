@@ -17,9 +17,16 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler(BuddyNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String resourceNotFoundException(BuddyNotFoundException notFoundException) {
-        log.error("Resource not found.", notFoundException);
-        return "Resource not found:\n" + notFoundException.getMessage();
+    public String buddyNotFoundException(BuddyNotFoundException notFoundException) {
+        log.error("Buddy not found.", notFoundException);
+        return "Buddy not found:\n" + notFoundException.getMessage();
+    }
+
+    @ExceptionHandler(BankAccountNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String bankAccountNotFoundException(BankAccountNotFoundException notFoundException) {
+        log.error("Bank account not found.", notFoundException);
+        return "Bank account not found:\n" + notFoundException.getMessage();
     }
 
     @ExceptionHandler(InvalidAmountException.class)

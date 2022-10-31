@@ -46,6 +46,8 @@ class ConnectionServiceTest {
 
     @MockBean
     ConnectionRepository connectionRepository;
+    @MockBean
+    PaginationService paginationService;
 
     @MockBean
     UserRepository userRepository;
