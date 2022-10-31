@@ -6,16 +6,16 @@ USE db_paymybuddy;
 CREATE TABLE user (
     user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(100),
-    firstname VARCHAR(50),
-    lastname VARCHAR(50),
-    balance DECIMAL(10, 2)
+    password VARCHAR(100) NOT NULL,
+    firstname VARCHAR(50) NOT NULL,
+    lastname VARCHAR(50) NOT NULL,
+    balance DECIMAL(10, 2) NOT NULL
 );
 
 CREATE TABLE connection (
     connection_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    fk_initializer_id INT NOT NULL,
-    fk_receiver_id INT NOT NULL,
+    fk_initializer_id INT NOT NULL PRIMARY KEY,
+    fk_receiver_id INT NOT NULL PRIMARY KEY,
     starting_date DATETIME NOT NULL,
     FOREIGN KEY (fk_initializer_id)
         REFERENCES user (user_id)
@@ -27,8 +27,8 @@ CREATE TABLE connection (
 
 CREATE TABLE transaction (
     transaction_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    fk_issuer_id INT NOT NULL,
-    fk_payee_id INT NOT NULL,
+    fk_issuer_id INT NOT NULL PRIMARY KEY,
+    fk_payee_id INT NOT NULL PRIMARY KEY,
     date DATETIME NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     description VARCHAR(140),
