@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -41,6 +42,8 @@ public class TransactionService {
 	 */
 	@Transactional
 	public Transaction createTransaction(User issuer, User payee, String description, double amount) {
+		Assert.notNull(issuer, "Issuer must not be null");
+		Assert.notNull(payee, "Payee must not be null");
 		// Check that amount is not negative nor 0
 		if (amount < 0) {
 			String errorMessage = "Transaction amount can not be negative.";
@@ -122,6 +125,7 @@ public class TransactionService {
 	}
 
 	public Optional<TransactionViewModel> getTransactionById(Integer id) {
+		Assert.notNull(id, "User ID must not be null");
 		if (transactionRepository.findById(id).isPresent()) {
 			return Optional.of(transactionToViewModel(transactionRepository.findById(id).get()));
 		} else {
@@ -136,6 +140,7 @@ public class TransactionService {
 	 * @return a list of transactions
 	 */
 	public List<TransactionViewModel> getUserTransactions(Integer id) {
+		Assert.notNull(id, "User ID must not be null");
 		if (userService.getUserById(id).isEmpty()) {
 			log.error("User does not exist.");
 			throw new BuddyNotFoundException("User does not exist.");

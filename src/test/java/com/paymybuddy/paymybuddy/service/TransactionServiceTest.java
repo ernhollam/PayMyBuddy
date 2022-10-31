@@ -46,6 +46,8 @@ class TransactionServiceTest {
     ConnectionService connectionService;
     @MockBean
     UserService       userService;
+    @MockBean
+    PaginationService paginationService;
 
     @MockBean
     Clock clock;
@@ -98,6 +100,26 @@ class TransactionServiceTest {
                                                                 payee,
                                                                 "amount negative",
                                                                 amount));
+    }
+
+    @Test
+    @DisplayName("Creating a transaction without an issuer should throw IllegalArgumentException")
+    void createTransaction_whenIssuer_isNull() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> transactionService.createTransaction(null,
+                                                                payee,
+                                                                "null issuer",
+                                                                30));
+    }
+
+    @Test
+    @DisplayName("Creating a transaction without a payee should throw IllegalArgumentException")
+    void createTransaction_whenPayee_isNull() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> transactionService.createTransaction(issuer,
+                                                                null,
+                                                                "null payee",
+                                                                30));
     }
 
     @Test
@@ -196,6 +218,20 @@ class TransactionServiceTest {
         List<TransactionViewModel> result = transactionService.getUserTransactions(issuer.getId());
 
         assertTrue(result.contains(TransactionService.transactionToViewModel(transaction)));
+    }
+
+    @Test
+    @DisplayName("Id should not be null when calling getTransactionById")
+    void getTransactionById_whenIDIsNull_shouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> transactionService.getTransactionById(null));
+    }
+
+    @Test
+    @DisplayName("Id should not be null when calling getUserTransactions")
+    void getUserTransactions_whenIDIsNull_shouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> transactionService.getUserTransactions(null));
     }
 
     @Test
