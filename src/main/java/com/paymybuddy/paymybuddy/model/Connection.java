@@ -21,12 +21,10 @@ public class Connection {
 	private Integer id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId
 	@JoinColumn(name = "fk_initializer_id")
 	private User initializer;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId
 	@JoinColumn(name = "fk_receiver_id")
 	private User receiver;
 
