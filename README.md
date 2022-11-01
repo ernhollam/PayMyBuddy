@@ -7,9 +7,34 @@ You are looking for an app that makes money transfer between friends? Say no mor
 
 With PayMyBuddy, you will be able to:
 - create an account,
-- deposit or withdraw money at any time to your account,
+- deposit or withdraw money at any time, from your bank account to your PayMyBuddy account,
 - add new connections with only their email address and,
 - transfer money to your dearest friends!
+
+## Disclaimer after the defense
+### With or without a bank account?
+After the defense, some changes have been made for the DAL layer, it was asked to add the bank account in the entities.
+The application worked fine without a bank account entity. `deposit()` and `withdraw()` were the methods which could perform the feature stated by "_At any time, users can transfer the money to their bank account_".
+
+However, this is how the app works with the bank account:
+- a user can have only one bank account (for simplicity reasons)
+- when depositing or withdrawing money, the amount is either added or subtracted from the bank account's balance.
+
+To add the bank account in the app, it is assumed that the app has access to a bank account's balance, which might not be possible in real life. Therefore, the app is still improvable regarding the bank account management.
+
+### Improvements made
+The defense still helped to improve the app's robustness, the latest changes are:
+- checking that the given IDs are not null before any operation
+- adding the foreign keys as primary keys in `transaction`, `connection` and `bank_account`tables, making the relations identifying relations. This prevents users to add the same connection or transaction more than once in the database (for connections, a check is already done in ConnectionService)
+- in `data.sql`, as the IDs are auto-incremented, there is no need to create the ID
+- UML diagram and physical data model are now with bank account,
+- unit tests and integration tests have been added to handle the changes due to bank account
+
+
+Last but not least:
+- repository and service layers only have been added to handle the bank account, thus the user must add a bank account in the database to make the application work properly.
+
+
 ## Getting started
 
 ### What you need

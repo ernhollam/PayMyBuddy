@@ -198,10 +198,9 @@ public class UserService {
                                                    "proceeded.");
         }
         BigDecimal amountToWithdraw = new BigDecimal(amount).setScale(Fee.SCALE, RoundingMode.HALF_UP);
-        // Subtract amount to deposit from bank account
+        // add amount to deposit from bank account
         bankAccount.get().setBalance(bankAccount.get().getBalance().add(amountToWithdraw));
-        // add amount to deposit to user's account
-
+        // subtract amount to deposit to user's account
         user.setBalance(user.getBalance().subtract(amountToWithdraw));
         userRepository.save(user);
     }
