@@ -32,7 +32,7 @@ The defense still helped to improve the app's robustness, the latest changes are
 
 
 Last but not least:
-- repository and service layers only have been added to handle the bank account, thus the user must add a bank account in the database to make the application work properly.
+- only the repository and service layers have been added to handle the bank account. As there is no controller layer, the user must add a bank account directly in the database to make the application work properly.
 
 
 ## Getting started
